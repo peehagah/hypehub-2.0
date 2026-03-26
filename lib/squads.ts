@@ -4,8 +4,20 @@ import yaml from 'js-yaml'
 import type { Squad, Pipeline, AgentConfig, PipelineStep, OutputFile, ClientBrief } from './types'
 import { stepLabel, stepNumber, isCheckpointStep } from './utils'
 
-/** Absolute path to /Agency/squads/ */
-const SQUADS_DIR = path.join(process.cwd(), '..', 'squads')
+/**
+ * Resolve squads directory:
+ * 1. SQUADS_DIR env var (explicit override)
+ * 2. data/squads/ inside the project (committed data — used on Vercel)
+ * 3. ../squads/ relative to cwd (local Agency monorepo layout)
+ */
+function resolveSquadsDir(): string {
+  if (process.env.SQUADS_DIR) return process.env.SQUADS_DIR
+  const internal = path.join(process.cwd(), 'data', 'squads')
+  if (fs.existsSync(internal)) return internal
+  return path.join(process.cwd(), '..', 'squads')
+}
+
+const SQUADS_DIR = resolveSquadsDir()
 
 // ── Squad list ─────────────────────────────────────────────────────────────
 

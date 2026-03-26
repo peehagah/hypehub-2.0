@@ -1,0 +1,40 @@
+name: "Influencer Hub"
+description: "Squad integrado para gestão diária de conteúdo e tráfego do Gabriel Cazonato no Instagram e YouTube, seguindo o Método EGO."
+code: influencer-hub
+icon: "🚀"
+version: "1.0.0"
+mode: alta-performance
+investigation:
+  enriched: false
+  notes: "Investigação do @gabrielcazonatoo pendente — rodar Sherlock inline para extrair padrões reais."
+
+agents:
+  - id: rodrigo-radar
+    name: Rodrigo Radar
+    icon: "📊"
+  - id: ivan-instagram
+    name: Ivan Instagram
+    icon: "✍️"
+  - id: yuri-youtube
+    name: Yuri YouTube
+    icon: "🎬"
+  - id: vera-veredito
+    name: Vera Veredito
+    icon: "💡"
+  - id: tiago-trafego
+    name: Tiago Tráfego
+    icon: "💰"
+
+skills:
+  - web_search
+  - web_fetch
+  - image-creator
+
+data:
+  - pipeline/data/research-brief.md
+  - pipeline/data/domain-framework.md
+  - pipeline/data/quality-criteria.md
+  - pipeline/data/output-examples.md
+  - pipeline/data/anti-patterns.md
+  - pipeline/data/tone-of-voice.md
+  - pipeline/data/client-brief-gabriel.md

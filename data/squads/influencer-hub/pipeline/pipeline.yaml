@@ -1,0 +1,22 @@
+name: "Influencer Hub Pipeline"
+version: "1.0.0"
+steps:
+  - step-01-research-focus-checkpoint.md
+  - step-02-rodrigo-radar.md
+  - step-03-theme-selection-checkpoint.md
+  - step-04-ivan-angles.md
+  - step-05-angle-selection-checkpoint.md
+  - step-06-ivan-create.md
+  - step-07-yuri-youtube.md
+  - step-08-content-approval-checkpoint.md
+  - step-09-vera-veredito.md
+  - step-10-final-approval-checkpoint.md
+  - step-11-tiago-trafego.md
+checkpoints:
+  - step-01-research-focus-checkpoint.md
+  - step-03-theme-selection-checkpoint.md
+  - step-05-angle-selection-checkpoint.md
+  - step-08-content-approval-checkpoint.md
+  - step-10-final-approval-checkpoint.md
+on_reject:
+  step-10-final-approval-checkpoint.md: [step-06-ivan-create.md, step-07-yuri-youtube.md]

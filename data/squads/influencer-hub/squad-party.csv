@@ -1,0 +1,6 @@
+id,name,title,icon,execution,path
+rodrigo-radar,Rodrigo Radar,Pesquisador de Tendências,📊,subagent,./agents/rodrigo-radar.agent.md
+ivan-instagram,Ivan Instagram,Criador de Conteúdo Instagram,✍️,inline,./agents/ivan-instagram.agent.md
+yuri-youtube,Yuri YouTube,Roteirista YouTube,🎬,subagent,./agents/yuri-youtube.agent.md
+vera-veredito,Vera Veredito,Revisora de Conteúdo,💡,inline,./agents/vera-veredito.agent.md
+tiago-trafego,Tiago Tráfego,Gestor de Tráfego Pago,💰,inline,./agents/tiago-trafego.agent.md
