@@ -17,6 +17,7 @@ import { cn, agentColor } from '@/lib/utils'
 import { PipelineBoard } from '@/components/pipeline-board'
 import { OutputsList } from '@/components/outputs-list'
 import { WsIndicator } from '@/components/ws-indicator'
+import { PipelineRunner } from '@/components/pipeline-runner'
 import type { Squad, AgentConfig, PipelineStep, OutputFile, SquadRunState, ClientBrief } from '@/lib/types'
 
 const TABS = ['Visão Geral', 'Agentes', 'Pipeline', 'Outputs', 'Brief'] as const
@@ -82,6 +83,7 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <WsIndicator onStateUpdate={handleStateUpdate} onDisconnect={handleDisconnect} />
+          <PipelineRunner squadCode={squad.code} squadName={squad.name} />
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/20">
             <div className="w-1.5 h-1.5 rounded-full bg-green-500 pulse-dot" />
             {squad.mode ?? 'Ativo'}

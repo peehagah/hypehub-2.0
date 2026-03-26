@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Bot, GitBranch, Instagram, Play, Target, Zap } from 'lucide-react'
 import { listSquads, loadAgents, loadClientBrief, getPipelineSteps, listOutputs } from '@/lib/squads'
 import { agentColor } from '@/lib/utils'
+import { PipelineRunner } from '@/components/pipeline-runner'
 
 export default function DashboardPage() {
   const squads = listSquads()
@@ -77,13 +78,16 @@ export default function DashboardPage() {
                 <p className="text-sm text-slate-500 mt-0.5 max-w-xl">{squad.description}</p>
               </div>
             </div>
-            <Link
-              href={`/squad/${squad.code}`}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium gradient-bg text-white hover:opacity-90 transition-opacity"
-            >
-              Ver squad completo
-              <ArrowRight size={14} />
-            </Link>
+            <div className="flex items-center gap-2">
+              <PipelineRunner squadCode={squad.code} squadName={squad.name} />
+              <Link
+                href={`/squad/${squad.code}`}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium gradient-bg text-white hover:opacity-90 transition-opacity"
+              >
+                Ver squad completo
+                <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
 
           {/* Client context (if brief loaded) */}
