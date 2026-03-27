@@ -25,30 +25,39 @@ export function Sidebar({ squads }: SidebarProps) {
   const pathname = usePathname()
 
   const navContent = (
-    <>
-      {/* Logo */}
+    <div className="flex flex-col h-full">
+      {/* Brand Logo */}
       <div
         className={cn(
-          'flex items-center gap-3 px-4 py-5 border-b border-[#2a2d3e]',
+          'flex items-center gap-4 px-6 py-8 border-b border-white/5',
           collapsed && 'justify-center px-0'
         )}
       >
-        <div className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center flex-shrink-0 shadow-lg shadow-coral/20">
-          <span className="text-white font-bold text-sm leading-none">OS</span>
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+          <span className="text-white font-black text-lg">AG</span>
         </div>
         {!collapsed && (
-          <div>
-            <span className="font-bold text-base gradient-text">Opensquad</span>
-            <p className="text-[10px] text-slate-500 -mt-0.5">Agent Pipeline Platform</p>
+          <div className="animate-fade-in">
+            <span className="font-black text-xl tracking-tight text-white italic">HypeHUB <span className="not-italic text-purple-500">NEO</span></span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">IA Hub · Online</p>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
-        {/* Dashboard */}
+      {/* Main Navigation */}
+      <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-none">
+        <p className={cn(
+          "text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-3 mb-4",
+          collapsed && "hidden"
+        )}>
+          Menu Principal
+        </p>
+        
         {[
-          { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+          { href: '/', label: 'Overview', icon: LayoutDashboard },
         ].map(({ href, label, icon: Icon }) => {
           const active = pathname === href
           return (
@@ -57,150 +66,138 @@ export function Sidebar({ squads }: SidebarProps) {
               href={href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
+                'group flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300',
                 active
-                  ? 'bg-gradient-to-r from-coral/20 to-purple/10 text-white border border-coral/20'
+                  ? 'bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.05)] border border-white/10'
                   : 'text-slate-400 hover:text-white hover:bg-white/5',
                 collapsed && 'justify-center px-0'
               )}
             >
-              <Icon size={18} className={active ? 'text-coral' : ''} />
+              <Icon size={20} className={cn(
+                'transition-transform duration-300 group-hover:scale-110',
+                active ? 'text-purple-400' : 'text-slate-500'
+              )} />
               {!collapsed && label}
+              {active && !collapsed && (
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+              )}
             </Link>
           )
         })}
 
-        {/* Squads section */}
+        {/* Squads Detail */}
         {!collapsed && (
-          <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-3 pt-5 pb-1">
-            Squads
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-3 pt-8 mb-4">
+            Meus Squads
           </p>
         )}
-        {collapsed && <div className="py-2 border-t border-[#2a2d3e] mx-2" />}
+        
+        <div className="space-y-1">
+          {squads.map((squad) => {
+            const href = `/workspace/${squad.code}`
+            const active = pathname.startsWith(href)
+            return (
+              <div key={squad.code} className="space-y-1">
+                <Link
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    'group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300',
+                    active ? 'bg-white/5 text-white' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5',
+                    collapsed && 'justify-center px-0'
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "w-8 h-8 rounded-xl flex items-center justify-center text-lg flex-shrink-0 transition-all duration-300",
+                      active ? "bg-purple-500/20 border border-purple-500/30 scale-110" : "bg-white/5 border border-white/10 group-hover:border-white/20"
+                    )}
+                  >
+                    {squad.icon}
+                  </div>
+                  {!collapsed && (
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold truncate leading-tight tracking-wide">{squad.name}</p>
+                      <p className="text-[10px] text-slate-600 font-medium truncate uppercase tracking-tighter mt-0.5">
+                        {squad.agents?.length ?? 0} Agentes Ativos
+                      </p>
+                    </div>
+                  )}
+                </Link>
 
-        {squads.map((squad) => {
-          const href = `/squad/${squad.code}`
-          const active = pathname.startsWith(href)
-          return (
-            <Link
-              key={squad.code}
-              href={href}
-              onClick={() => setMobileOpen(false)}
-              className={cn(
-                'flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-150',
-                active ? 'bg-coral/10 text-white border border-coral/15' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5',
-                collapsed && 'justify-center px-0'
-              )}
-            >
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 border"
-                style={
-                  active
-                    ? { background: 'rgba(255,107,107,0.2)', borderColor: 'rgba(255,107,107,0.3)' }
-                    : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)' }
-                }
-              >
-                {squad.icon}
+                {/* Sub-links Expanders */}
+                {active && !collapsed && (
+                  <div className="ml-12 pl-4 border-l border-white/5 space-y-1 animate-fade-in py-1">
+                    <a href={`${href}#agentes`} className="flex items-center gap-2 py-2 text-[11px] font-bold text-slate-500 hover:text-purple-400 transition-colors">
+                      <Bot size={14} /> Monitor de Dados
+                    </a>
+                    <a href={`${href}#pipeline`} className="flex items-center gap-2 py-2 text-[11px] font-bold text-slate-500 hover:text-purple-400 transition-colors">
+                      <GitBranch size={14} /> Automação Pipeline
+                    </a>
+                  </div>
+                )}
               </div>
-              {!collapsed && (
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium truncate leading-tight">{squad.name}</p>
-                  <p className="text-[10px] text-slate-600 truncate">{squad.agents?.length ?? 0} agentes</p>
-                </div>
-              )}
-            </Link>
-          )
-        })}
-
-        {/* Sub-links when a squad is active */}
-        {squads.map((squad) => {
-          const squadHref = `/squad/${squad.code}`
-          if (!pathname.startsWith(squadHref)) return null
-          const subLinks = [
-            { href: `${squadHref}#agentes`, label: 'Agentes', icon: Bot },
-            { href: `${squadHref}#pipeline`, label: 'Pipeline', icon: GitBranch },
-          ]
-          if (collapsed) return null
-          return subLinks.map(({ href, label, icon: Icon }) => (
-            <a
-              key={href}
-              href={href}
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] text-slate-600 hover:text-slate-300 hover:bg-white/5 transition-colors ml-3"
-            >
-              <Icon size={12} />
-              {label}
-            </a>
-          ))
-        })}
+            )
+          })}
+        </div>
       </nav>
 
-      {/* Bottom: operator identity */}
-      <div className="border-t border-[#2a2d3e] p-3">
-        <div
-          className={cn(
-            'flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-white/5 transition-colors',
-            collapsed && 'justify-center px-0'
-          )}
-        >
-          <div className="w-7 h-7 rounded-full gradient-bg flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            P
+      {/* Operator Status */}
+      <div className="p-6">
+        <div className="glass-panel p-4 flex items-center gap-3 border border-white/10">
+          <div className="relative">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white font-black">
+              P
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-4 border-[#060810] z-10"></div>
           </div>
           {!collapsed && (
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-white truncate">Pedro</p>
-              <p className="text-[10px] text-slate-500 truncate">Head de Marketing</p>
+            <div className="min-w-0 flex-1 animate-fade-in">
+              <p className="text-sm font-black text-white truncate">Pedro H.</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Admin</p>
             </div>
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 
   return (
     <>
-      {/* Mobile hamburger */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-3 left-3 z-50 md:hidden w-10 h-10 rounded-xl bg-[#161822] border border-[#2a2d3e] flex items-center justify-center text-slate-400 hover:text-white transition-colors shadow-lg"
+        className="fixed top-6 left-6 z-50 md:hidden w-12 h-12 rounded-2xl glass-panel flex items-center justify-center text-white transition-all shadow-2xl active:scale-90"
       >
-        <Menu size={18} />
+        <Menu size={20} />
       </button>
 
       {mobileOpen && (
-        <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden animate-fade-in" onClick={() => setMobileOpen(false)} />
       )}
 
-      {/* Desktop */}
+      {/* Desktop Persistent Sidebar */}
       <aside
         className={cn(
-          'relative hidden md:flex flex-col h-screen transition-all duration-300 ease-in-out border-r border-[#2a2d3e] flex-shrink-0',
-          collapsed ? 'w-16' : 'w-60'
+          'relative hidden md:flex flex-col h-screen transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] glass-sidebar z-30',
+          collapsed ? 'w-24' : 'w-80'
         )}
-        style={{ background: '#161822' }}
       >
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-6 z-10 w-6 h-6 rounded-full bg-[#2a2d3e] border border-[#3a3d4e] flex items-center justify-center text-slate-400 hover:text-white hover:bg-[#3a3d4e] transition-colors"
+          className="absolute -right-4 top-10 z-10 w-8 h-8 rounded-full glass-panel flex items-center justify-center text-white border border-white/20 hover:scale-110 transition-transform active:scale-95"
         >
-          {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </button>
         {navContent}
       </aside>
 
-      {/* Mobile drawer */}
+      {/* Mobile Sidebar Overlay */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex flex-col w-72 transition-transform duration-300 border-r border-[#2a2d3e] md:hidden',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+          'fixed inset-y-0 left-0 z-50 flex flex-col w-[85%] max-w-[320px] transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] glass-sidebar md:hidden',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full shadow-none'
         )}
-        style={{ background: '#161822' }}
       >
-        <button
-          onClick={() => setMobileOpen(false)}
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-lg bg-[#2a2d3e] flex items-center justify-center text-slate-400 hover:text-white"
-        >
-          <X size={14} />
-        </button>
         {navContent}
       </aside>
     </>

@@ -64,15 +64,18 @@ export function WsIndicator({ onStateUpdate, onDisconnect }: WsIndicatorProps) {
   return (
     <div
       className={cn(
-        'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium border',
+        'flex items-center gap-2 px-3 py-1.5 rounded-2xl text-[10px] font-black border transition-all duration-500 uppercase tracking-widest',
         connected
-          ? 'bg-green-500/10 text-green-400 border-green-500/20'
-          : 'bg-[#2a2d3e] text-slate-500 border-transparent'
+          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
+          : 'bg-white/[0.03] text-slate-500 border-white/5'
       )}
-      title={connected ? 'Pipeline Runner conectado' : 'Pipeline Runner desconectado'}
+      title={connected ? 'Stream de Dados Ativo' : 'Stream de Dados Desconectado'}
     >
-      {connected ? <Wifi size={10} /> : <WifiOff size={10} />}
-      {connected ? 'Live' : 'Offline'}
+      <div className={cn(
+        "w-1.5 h-1.5 rounded-full shadow-sm",
+        connected ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" : "bg-slate-700"
+      )} />
+      {connected ? 'LIVE' : 'OFFLINE'}
     </div>
   )
 }

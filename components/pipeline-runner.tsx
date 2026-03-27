@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Play, X, Terminal, Loader2, CheckCircle, AlertCircle, Copy, Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface Props {
   squadCode: string
@@ -116,115 +117,127 @@ export function PipelineRunner({ squadCode, squadName }: Props) {
       {/* Trigger button */}
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500/20 hover:border-green-500/30 transition-all"
+        className="flex items-center gap-2 px-6 py-2.5 rounded-2xl text-[10px] font-black bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.1)] group"
       >
-        <Play size={14} className="fill-green-400" />
-        Executar Pipeline
+        <Play size={14} className="fill-emerald-400 group-hover:scale-110 transition-transform" />
+        Executar Automação
       </button>
 
       {/* Overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-6 animate-fade-in"
           onClick={(e) => { if (e.target === e.currentTarget) handleClose() }}
         >
-          <div className="w-full max-w-2xl rounded-2xl border border-[#2a2d3e] bg-[#0f1117] shadow-2xl overflow-hidden flex flex-col"
-               style={{ maxHeight: '80vh' }}>
+          <div className="w-full max-w-2xl glass-panel border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent shadow-2xl flex flex-col overflow-hidden animate-zoom-in"
+               style={{ maxHeight: '85vh' }}>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2d3e]">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center">
-                  <Terminal size={15} className="text-green-400" />
+            <div className="flex items-center justify-between px-8 py-6 border-b border-white/5">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-[1.2rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shadow-lg">
+                  <Terminal size={20} className="text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">Executar Pipeline</p>
-                  <p className="text-[11px] text-slate-500">{squadName}</p>
+                  <p className="text-sm font-black text-white uppercase tracking-tight">Console de Operações</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{squadName}</p>
                 </div>
               </div>
-              <button onClick={handleClose} className="w-7 h-7 rounded-lg bg-[#2a2d3e] flex items-center justify-center text-slate-400 hover:text-white transition-colors">
-                <X size={13} />
+              <button 
+                onClick={handleClose} 
+                className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+              >
+                <X size={18} />
               </button>
             </div>
 
             {/* Command bar */}
-            <div className="px-5 py-3 border-b border-[#2a2d3e] flex items-center gap-3">
-              <div className="flex-1 flex items-center gap-2 bg-[#161822] border border-[#2a2d3e] rounded-lg px-3 py-2 font-mono text-xs text-slate-300">
-                <span className="text-slate-600">$</span>
-                <span className="text-green-400">{command}</span>
+            <div className="px-8 py-4 border-b border-white/5 flex items-center gap-4 bg-white/[0.02]">
+              <div className="flex-1 flex items-center gap-3 bg-black/40 border border-white/5 rounded-xl px-4 py-3 font-mono text-[11px]">
+                <span className="text-slate-600 font-bold">$</span>
+                <span className="text-emerald-400 font-bold tracking-tight">{command}</span>
               </div>
               <button
                 onClick={copyCommand}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#2a2d3e] text-xs text-slate-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 text-[9px] font-black text-slate-500 hover:text-white transition-all uppercase tracking-widest"
               >
-                {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
-                {copied ? 'Copiado' : 'Copiar'}
+                {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                {copied ? 'Copied' : 'Copy'}
               </button>
             </div>
 
             {/* Terminal output */}
-            {status !== 'idle' && (
-              <div
-                ref={terminalRef}
-                className="flex-1 overflow-y-auto p-4 font-mono text-xs leading-relaxed text-slate-300 bg-[#080a0f] scrollbar-none"
-                style={{ minHeight: '200px' }}
-              >
-                {lines.map((line, i) => (
-                  <div key={i} className={
-                    line.startsWith('✓') ? 'text-green-400' :
-                    line.startsWith('✗') ? 'text-red-400' :
-                    line.startsWith('[stderr]') ? 'text-yellow-500/70' :
-                    line.startsWith('#') || line.startsWith('##') ? 'text-coral font-semibold' :
-                    'text-slate-300'
-                  }>
-                    {line || '\u00A0'}
-                  </div>
-                ))}
-                {status === 'running' && (
-                  <span className="inline-block w-2 h-4 bg-green-400 animate-pulse ml-0.5" />
-                )}
-              </div>
-            )}
+            <div
+              ref={terminalRef}
+              className="flex-1 overflow-y-auto p-8 font-mono text-[11px] leading-relaxed text-slate-400 bg-black/40 scrollbar-none selection:bg-emerald-500/20"
+              style={{ minHeight: '300px' }}
+            >
+              {status === 'idle' && (
+                 <div className="flex flex-col items-center justify-center h-full text-center py-10 opacity-30">
+                    <Terminal size={32} className="mb-4" />
+                    <p className="font-bold uppercase tracking-widest">Console pronto para execução.</p>
+                 </div>
+              )}
+              {lines.map((line, i) => (
+                <div key={i} className={cn(
+                  "py-0.5",
+                  line.startsWith('✓') ? 'text-emerald-400 font-black' :
+                  line.startsWith('✗') ? 'text-red-400 font-black' :
+                  line.startsWith('[stderr]') ? 'text-orange-500/70' :
+                  line.startsWith('#') || line.startsWith('##') ? 'text-purple-400 font-black uppercase tracking-tight' :
+                  'text-slate-400'
+                )}>
+                  {line || '\u00A0'}
+                </div>
+              ))}
+              {status === 'running' && (
+                <div className="flex items-center gap-2 mt-2">
+                   <div className="w-1.5 h-3.5 bg-emerald-500 animate-pulse" />
+                   <span className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest">Waiting for output...</span>
+                </div>
+              )}
+            </div>
 
             {/* Footer actions */}
-            <div className="px-5 py-4 border-t border-[#2a2d3e] flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-black/20">
+              <div className="flex items-center gap-4">
                 {status === 'running' && (
-                  <><Loader2 size={14} className="text-green-400 animate-spin" />
-                  <span className="text-xs text-slate-400">Executando...</span></>
+                  <div className="flex items-center gap-3">
+                    <Loader2 size={16} className="text-emerald-400 animate-spin" />
+                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest animate-pulse">Running Task</span>
+                  </div>
                 )}
                 {status === 'done' && (
-                  <><CheckCircle size={14} className="text-green-400" />
-                  <span className="text-xs text-green-400">Pipeline finalizado</span></>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle size={16} className="text-emerald-400" />
+                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Execution Finished</span>
+                  </div>
                 )}
                 {status === 'error' && (
-                  <><AlertCircle size={14} className="text-red-400" />
-                  <span className="text-xs text-red-400">Erro na execução</span></>
+                  <div className="flex items-center gap-3">
+                    <AlertCircle size={16} className="text-red-400" />
+                    <span className="text-[10px] font-black text-red-400 uppercase tracking-widest">Fatal System Error</span>
+                  </div>
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
-                {status === 'idle' && (
-                  <p className="text-xs text-slate-600 mr-2">
-                    Executa o pipeline completo com todos os agentes
-                  </p>
-                )}
+              <div className="flex items-center gap-3">
                 {(status === 'idle' || status === 'done' || status === 'error') && (
                   <button
                     onClick={runPipeline}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-green-500 hover:bg-green-400 text-black transition-colors"
+                    className="flex items-center gap-3 px-8 py-3 rounded-xl text-xs font-black bg-emerald-500 text-black hover:bg-emerald-400 transition-all uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                   >
-                    <Play size={13} className="fill-black" />
-                    {status === 'idle' ? 'Executar' : 'Executar novamente'}
+                    <Play size={14} className="fill-black" />
+                    {status === 'idle' ? 'Start Run' : 'Re-run Operation'}
                   </button>
                 )}
                 {status === 'running' && (
                   <button
                     onClick={() => { readerRef.current?.cancel(); setStatus('error'); }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+                    className="flex items-center gap-3 px-8 py-3 rounded-xl text-xs font-black bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all uppercase tracking-widest"
                   >
-                    <X size={13} />
-                    Cancelar
+                    <X size={14} />
+                    Terminate
                   </button>
                 )}
               </div>

@@ -12,33 +12,11 @@ export function PipelineBoard({ steps, runState }: PipelineBoardProps) {
   const totalSteps = steps.length
 
   return (
-    <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-      <div className="flex items-center gap-2 mb-5">
-        <GitBranch size={16} className="text-slate-400" />
-        <h3 className="text-sm font-semibold text-white">Pipeline</h3>
-        <span className="ml-auto text-xs text-slate-500">{totalSteps} steps</span>
-        {runState && (
-          <span
-            className={cn(
-              'text-[10px] font-semibold px-2 py-0.5 rounded-full',
-              runState.status === 'running'
-                ? 'bg-green-500/15 text-green-400 border border-green-500/20'
-                : runState.status === 'checkpoint'
-                ? 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/20'
-                : runState.status === 'completed'
-                ? 'bg-coral/15 text-coral border border-coral/20'
-                : 'bg-[#2a2d3e] text-slate-500'
-            )}
-          >
-            {runState.status === 'running'
-              ? 'Rodando'
-              : runState.status === 'checkpoint'
-              ? '⚡ Checkpoint'
-              : runState.status === 'completed'
-              ? 'Completo'
-              : 'Aguardando'}
-          </span>
-        )}
+    <div className="glass-panel p-6 border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent">
+      <div className="flex items-center gap-3 mb-6">
+        <GitBranch size={18} className="text-purple-400" />
+        <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Fluxo Operacional</h3>
+        <span className="ml-auto text-[10px] font-black text-slate-500 uppercase tracking-widest">{totalSteps} STAGES</span>
       </div>
 
       <div className="space-y-2">
@@ -52,43 +30,43 @@ export function PipelineBoard({ steps, runState }: PipelineBoardProps) {
             <div
               key={step.filename}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-colors',
+                'flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all duration-300',
                 step.isCheckpoint
                   ? isDone
-                    ? 'border-coral/20 bg-coral/5'
+                    ? 'border-purple-500/20 bg-purple-500/5'
                     : isActive
-                    ? 'border-yellow-500/30 bg-yellow-500/10'
-                    : 'border-[#2a2d3e] bg-[#0f1117]'
+                    ? 'border-orange-500/30 bg-orange-500/10 shadow-[0_0_15px_rgba(249,115,22,0.1)]'
+                    : 'border-white/5 bg-white/[0.02]'
                   : isDone
-                  ? 'border-green-500/20 bg-green-500/5'
+                  ? 'border-emerald-500/20 bg-emerald-500/5'
                   : isActive
-                  ? 'border-coral/30 bg-coral/8'
-                  : 'border-[#2a2d3e] bg-[#0f1117]'
+                  ? 'border-purple-500/30 bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
+                  : 'border-white/5 bg-white/[0.02]'
               )}
             >
               {/* Step icon */}
               <div className="flex-shrink-0">
                 {step.isCheckpoint ? (
                   <CircleDot
-                    size={14}
+                    size={16}
                     className={cn(
-                      isDone ? 'text-coral' : isActive ? 'text-yellow-400' : 'text-slate-600'
+                      isDone ? 'text-purple-400' : isActive ? 'text-orange-400 animate-pulse' : 'text-slate-700'
                     )}
                   />
                 ) : isDone ? (
-                  <CheckCircle2 size={14} className="text-green-400" />
+                  <CheckCircle2 size={16} className="text-emerald-400" />
                 ) : isActive ? (
-                  <Loader2 size={14} className="text-coral animate-spin" />
+                  <Loader2 size={16} className="text-purple-400 animate-spin" />
                 ) : (
-                  <div className="w-3.5 h-3.5 rounded-full border border-slate-700" />
+                  <div className="w-4 h-4 rounded-full border-2 border-slate-800" />
                 )}
               </div>
 
               {/* Step number */}
               <span
                 className={cn(
-                  'text-[10px] font-mono font-semibold w-6 flex-shrink-0',
-                  isDone ? 'text-green-500' : isActive ? 'text-coral' : 'text-slate-600'
+                  'text-[10px] font-black w-6 flex-shrink-0 tracking-tighter',
+                  isDone ? 'text-emerald-500' : isActive ? 'text-purple-400' : 'text-slate-700'
                 )}
               >
                 {String(step.stepNumber).padStart(2, '0')}
@@ -97,28 +75,27 @@ export function PipelineBoard({ steps, runState }: PipelineBoardProps) {
               {/* Label */}
               <span
                 className={cn(
-                  'text-xs flex-1 truncate',
+                  'text-[11px] font-bold flex-1 truncate uppercase tracking-tight',
                   isDone
-                    ? 'text-slate-400'
+                    ? 'text-slate-500 line-through decoration-slate-700'
                     : isActive
-                    ? 'text-white font-medium'
-                    : 'text-slate-500'
+                    ? 'text-white'
+                    : 'text-slate-600'
                 )}
               >
                 {step.label}
               </span>
 
-              {/* Checkpoint badge */}
-              {step.isCheckpoint && (
-                <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-yellow-500/15 text-yellow-500 border border-yellow-500/20 flex-shrink-0">
-                  CHECKPOINT
-                </span>
+              {/* Status Badge */}
+              {isActive && (
+                 <span className="text-[8px] font-black px-2 py-0.5 rounded-full bg-purple-500 text-white animate-pulse uppercase tracking-widest">
+                    ACTIVE
+                 </span>
               )}
-
-              {/* Active step label from runState */}
-              {isActive && runState?.step?.label && (
-                <span className="text-[10px] text-coral/70 flex-shrink-0 truncate max-w-[120px]">
-                  {runState.step.label}
+              
+              {step.isCheckpoint && !isDone && (
+                <span className="text-[8px] font-black px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/20 uppercase tracking-widest">
+                  CHECKPOINT
                 </span>
               )}
             </div>
@@ -126,19 +103,36 @@ export function PipelineBoard({ steps, runState }: PipelineBoardProps) {
         })}
       </div>
 
-      {/* Progress bar when running */}
-      {runState && runState.status === 'running' && totalSteps > 0 && (
-        <div className="mt-4 pt-4 border-t border-[#2a2d3e]">
-          <div className="flex justify-between text-[10px] text-slate-500 mb-1.5">
-            <span>Progresso</span>
-            <span>{currentStep}/{totalSteps} steps</span>
+      {/* Progress Footer */}
+      {runState && (
+        <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+               <span className={cn(
+                  "w-2 h-2 rounded-full animate-pulse",
+                  runState.status === 'running' ? "bg-emerald-500" : "bg-orange-500"
+               )}></span>
+               <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none">
+                  {runState.status === 'running' ? 'Executando Pipeline' : 'Aguardando Checkpoint'}
+               </p>
+            </div>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+               {currentStep} / {totalSteps} COMPLETO
+            </span>
           </div>
-          <div className="h-1.5 rounded-full bg-[#2a2d3e] overflow-hidden">
+          
+          <div className="h-1.5 rounded-full bg-white/5 overflow-hidden p-[1px] border border-white/5">
             <div
-              className="h-full rounded-full bg-gradient-brand transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all duration-700 ease-out"
               style={{ width: `${Math.round((currentStep / totalSteps) * 100)}%` }}
             />
           </div>
+          
+          {runState.step?.label && (
+             <p className="text-[9px] font-bold text-slate-500 italic text-right uppercase tracking-tighter">
+                Log: {runState.step.label}
+             </p>
+          )}
         </div>
       )}
     </div>

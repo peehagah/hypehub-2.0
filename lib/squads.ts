@@ -18,6 +18,7 @@ function resolveSquadsDir(): string {
 }
 
 const SQUADS_DIR = resolveSquadsDir()
+console.log('>>> SQUADS_DIR RESOLVED TO:', SQUADS_DIR)
 
 // ── Squad list ─────────────────────────────────────────────────────────────
 
@@ -33,12 +34,17 @@ export function listSquads(): Squad[] {
 
 export function loadSquad(code: string): Squad | null {
   const file = path.join(SQUADS_DIR, code, 'squad.yaml')
-  if (!fs.existsSync(file)) return null
+  console.log('>>> LOADING SQUAD FROM:', file)
+  if (!fs.existsSync(file)) {
+    console.log('>>> SQUAD FILE NOT FOUND!')
+    return null
+  }
   try {
     const raw = fs.readFileSync(file, 'utf-8')
     const data = yaml.load(raw) as Record<string, unknown>
     return { ...data, code } as Squad
-  } catch {
+  } catch (err) {
+    console.log('>>> YAML LOAD ERROR:', err)
     return null
   }
 }

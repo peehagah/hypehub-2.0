@@ -3,17 +3,17 @@ import { loadSquad, loadAgents, getPipelineSteps, listOutputs, loadClientBrief }
 import { SquadDetailClient } from '@/components/squad-detail-client'
 
 interface Props {
-  params: { code: string }
+  params: { client: string }
 }
 
 export default function SquadPage({ params }: Props) {
-  const squad = loadSquad(params.code)
+  const squad = loadSquad(params.client)
   if (!squad) notFound()
 
-  const agents = loadAgents(params.code)
-  const steps = getPipelineSteps(params.code)
-  const outputs = listOutputs(params.code)
-  const brief = loadClientBrief(params.code)
+  const agents = loadAgents(params.client)
+  const steps = getPipelineSteps(params.client)
+  const outputs = listOutputs(params.client)
+  const brief = loadClientBrief(params.client)
 
   return (
     <SquadDetailClient

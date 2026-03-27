@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   LayoutDashboard,
   GitBranch,
@@ -51,6 +51,15 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
   const checkpoints = steps.filter((s) => s.isCheckpoint)
   const agentSteps = steps.filter((s) => !s.isCheckpoint)
 
+  const [greeting, setGreeting] = useState('')
+
+  useEffect(() => {
+    const hour = new Date().getHours()
+    if (hour >= 5 && hour < 12) setGreeting('Bom dia')
+    else if (hour >= 12 && hour < 18) setGreeting('Boa tarde')
+    else setGreeting('Boa noite')
+  }, [])
+
   const tabIcons: Record<Tab, React.ReactNode> = {
     'Visão Geral': <LayoutDashboard size={14} />,
     Agentes: <Bot size={14} />,
@@ -63,53 +72,55 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
     <div className="p-4 md:p-6 space-y-6 max-w-[1400px] mx-auto">
 
       {/* ── Header ── */}
-      <div className="flex flex-wrap items-start gap-4">
+      <div className="glass-panel p-8 flex flex-wrap items-center gap-6 border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent">
         <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-          style={{ background: 'rgba(255,107,107,0.12)', border: '1px solid rgba(255,107,107,0.22)' }}
+          className="w-20 h-20 rounded-[2rem] flex items-center justify-center text-4xl flex-shrink-0 shadow-[0_0_30px_rgba(168,85,247,0.2)]"
+          style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)' }}
         >
           {squad.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl md:text-2xl font-bold text-white">{squad.name}</h1>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-white uppercase italic">
+               {greeting ? `${greeting}, ` : ''}<span className="not-italic text-purple-500">Pedro</span>
+            </h1>
             {brief && (
-              <span className="text-xs text-slate-500 bg-[#2a2d3e] px-2.5 py-1 rounded-full">
+              <span className="text-[10px] font-black text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20 uppercase tracking-widest">
                 Cliente: {brief.clientName}
               </span>
             )}
           </div>
-          <p className="text-slate-500 text-sm mt-1 line-clamp-2">{squad.description}</p>
+          <p className="text-slate-400 text-sm mt-2 font-medium leading-relaxed max-w-2xl">{squad.description}</p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <WsIndicator onStateUpdate={handleStateUpdate} onDisconnect={handleDisconnect} />
           <PipelineRunner squadCode={squad.code} squadName={squad.name} />
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/20">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 pulse-dot" />
-            {squad.mode ?? 'Ativo'}
+          <div className="flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+            {squad.mode ?? 'ONLINE'}
           </div>
         </div>
       </div>
 
       {/* ── Tabs ── */}
-      <div>
+      <div className="space-y-8">
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none">
-          <div className="flex items-center gap-1 border-b border-[#2a2d3e] mb-6 min-w-max md:min-w-0">
+          <div className="flex items-center gap-2 border-b border-white/5 mb-8 min-w-max md:min-w-0">
             {TABS.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  'px-3 md:px-4 py-2.5 text-sm font-medium transition-all duration-150 border-b-2 -mb-px flex items-center gap-1.5 whitespace-nowrap min-h-[44px]',
+                  'px-6 py-4 text-[10px] font-black transition-all duration-300 border-b-2 -mb-px flex items-center gap-2 uppercase tracking-[0.2em]',
                   activeTab === tab
-                    ? 'border-coral text-white'
+                    ? 'border-purple-500 text-white'
                     : 'border-transparent text-slate-500 hover:text-slate-300'
                 )}
               >
                 {tabIcons[tab]}
                 {tab}
                 {tab === 'Outputs' && outputs.length > 0 && (
-                  <span className="text-[10px] bg-coral/20 text-coral px-1.5 py-0.5 rounded-full">
+                  <span className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/20">
                     {outputs.length}
                   </span>
                 )}
@@ -120,80 +131,78 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
 
         {/* ─────────── Visão Geral ─────────── */}
         {activeTab === 'Visão Geral' && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
 
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { label: 'Agentes', value: agents.length, sub: 'especializados', color: '#ff4dca' },
-                { label: 'Pipeline steps', value: steps.length, sub: `${checkpoints.length} checkpoints`, color: '#9b59ff' },
-                { label: 'Skills', value: squad.skills?.length ?? 0, sub: squad.skills?.slice(0, 2).join(', ') || '—', color: '#3b82f6' },
-                { label: 'Outputs', value: outputs.length, sub: 'arquivos gerados', color: '#22c55e' },
-              ].map(({ label, value, sub, color }) => (
-                <div key={label} className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-2">{label}</p>
-                  <p className="text-3xl font-bold text-white">{value}</p>
-                  <p className="text-[10px] text-slate-600 mt-1 truncate">{sub}</p>
-                  <div className="mt-2 h-0.5 rounded-full" style={{ background: `${color}40` }} />
+                { label: 'Agentes', value: agents.length, sub: 'especializados', color: 'text-pink-400', glow: 'rgba(236,72,153,0.1)' },
+                { label: 'Pipeline steps', value: steps.length, sub: `${checkpoints.length} checkpoints`, color: 'text-purple-400', glow: 'rgba(168,85,247,0.1)' },
+                { label: 'Skills', value: squad.skills?.length ?? 0, sub: squad.skills?.slice(0, 2).join(', ') || '—', color: 'text-cyan-400', glow: 'rgba(6,182,212,0.1)' },
+                { label: 'Outputs', value: outputs.length, sub: 'arquivos gerados', color: 'text-emerald-400', glow: 'rgba(16,185,129,0.1)' },
+              ].map(({ label, value, sub, color, glow }) => (
+                <div key={label} className="glass-panel p-6 glass-panel-interactive border-white/5 relative overflow-hidden group">
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">{label}</p>
+                  <p className={cn("text-4xl font-black transition-transform duration-300 group-hover:scale-105", color)}>{value}</p>
+                  <p className="text-[10px] font-bold text-slate-600 mt-2 uppercase tracking-tight truncate">{sub}</p>
+                  <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full blur-2xl transition-colors" style={{ background: glow }}></div>
                 </div>
               ))}
             </div>
 
-            {/* Client brief summary */}
+            {/* Client context (if brief loaded) */}
             {brief && (
-              <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Contexto do cliente</p>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="glass-panel p-8 border-white/5 bg-gradient-to-br from-pink-500/[0.03] to-transparent">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-6">Contexto Estratégico do Cliente</p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Identity */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-coral/10 border border-coral/20 flex items-center justify-center text-xl">🎯</div>
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(236,72,153,0.2)]">🎯</div>
                       <div>
-                        <p className="text-sm font-bold text-white">{brief.clientName}</p>
-                        <p className="text-xs text-slate-500">{brief.niche}</p>
+                        <p className="text-lg font-black text-white uppercase tracking-tight">{brief.clientName}</p>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{brief.niche}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
-                      <span className="flex items-center gap-1.5">
-                        <Instagram size={12} className="text-pink-400" />
+                    <div className="flex items-center gap-4 text-[11px] font-bold">
+                      <span className="flex items-center gap-2 text-slate-400 hover:text-pink-400 transition-colors cursor-pointer">
+                        <Instagram size={14} className="text-pink-400" />
                         @{brief.instagram.split('—')[0].trim()}
                       </span>
-                      <span className="text-slate-700">·</span>
-                      <span className="flex items-center gap-1.5">
-                        <Play size={12} className="text-red-400" />
+                      <span className="text-white/10">|</span>
+                      <span className="flex items-center gap-2 text-slate-400 hover:text-red-400 transition-colors cursor-pointer">
+                        <Play size={14} className="text-red-400" />
                         @{brief.youtube.split('—')[0].trim()}
                       </span>
                     </div>
-                    <div className="flex gap-2">
-                      <div className="px-3 py-2 rounded-lg bg-[#0f1117] border border-[#2a2d3e] text-center flex-1">
-                        <p className="text-[10px] text-slate-600 mb-1">Meta IG</p>
-                        <p className="text-sm font-bold text-white">500k</p>
-                      </div>
-                      <div className="px-3 py-2 rounded-lg bg-[#0f1117] border border-[#2a2d3e] text-center flex-1">
-                        <p className="text-[10px] text-slate-600 mb-1">Meta YT</p>
-                        <p className="text-sm font-bold text-white">100k</p>
-                      </div>
-                      <div className="px-3 py-2 rounded-lg bg-[#0f1117] border border-[#2a2d3e] text-center flex-1">
-                        <p className="text-[10px] text-slate-600 mb-1">Produto</p>
-                        <p className="text-sm font-bold text-white">R$10k</p>
-                      </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { label: 'Meta IG', val: '500k' },
+                        { label: 'Meta YT', val: '100k' },
+                        { label: 'Ticket', val: 'R$10k' },
+                      ].map(m => (
+                        <div key={m.label} className="px-4 py-3 rounded-2xl bg-white/5 border border-white/5 text-center transition-transform hover:scale-105">
+                          <p className="text-[9px] font-black text-slate-500 uppercase mb-1">{m.label}</p>
+                          <p className="text-sm font-black text-white">{m.val}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
                   {/* Método EGO */}
-                  <div>
-                    <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-2">Método EGO</p>
-                    <div className="space-y-2">
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Framework: Método EGO</p>
+                    <div className="grid grid-cols-1 gap-3">
                       {[
-                        { k: 'E', label: 'Essência', color: '#ff6b6b', text: brief.egoMethod.E },
-                        { k: 'G', label: 'Generosidade', color: '#22c55e', text: brief.egoMethod.G },
-                        { k: 'O', label: 'Ousadia', color: '#9b59ff', text: brief.egoMethod.O },
-                      ].map(({ k, label, color, text }) => (
-                        <div key={k} className="flex items-start gap-2.5 px-3 py-2 rounded-lg border" style={{ background: `${color}08`, borderColor: `${color}20` }}>
-                          <span className="w-5 h-5 rounded flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: `${color}25`, color }}>{k}</span>
+                        { k: 'E', label: 'Essência', color: 'text-pink-400', bg: 'rgba(236,72,153,0.1)', border: 'rgba(236,72,153,0.2)', text: brief.egoMethod.E },
+                        { k: 'G', label: 'Generosidade', color: 'text-emerald-400', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)', text: brief.egoMethod.G },
+                        { k: 'O', label: 'Ousadia', color: 'text-purple-400', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.2)', text: brief.egoMethod.O },
+                      ].map(({ k, label, color, bg, border, text }) => (
+                        <div key={k} className="flex items-start gap-4 px-4 py-3 rounded-2xl border bg-white/[0.02] hover:bg-white/[0.05] transition-colors" style={{ borderColor: border }}>
+                          <span className={cn("w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black flex-shrink-0 shadow-lg", color)} style={{ background: bg }}>{k}</span>
                           <div className="min-w-0">
-                            <p className="text-[10px] font-semibold text-white">{label}</p>
-                            <p className="text-[10px] text-slate-500 leading-relaxed mt-0.5 line-clamp-2">{text}</p>
+                            <p className="text-[11px] font-black text-white uppercase tracking-wider">{label}</p>
+                            <p className="text-[10px] text-slate-400 font-medium leading-relaxed mt-1 line-clamp-2">{text}</p>
                           </div>
                         </div>
                       ))}
@@ -204,41 +213,47 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
             )}
 
             {/* Pipeline snapshot + Agents side by side */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <PipelineBoard steps={steps} runState={runState} />
 
               {/* Agent quick list */}
-              <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                <p className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                  <Bot size={14} className="text-slate-400" />
-                  Agentes
-                  <span className="text-xs text-slate-500 ml-1">{agents.length} no squad</span>
-                </p>
-                <div className="space-y-2">
+              <div className="glass-panel p-6 border-white/5 bg-gradient-to-br from-purple-500/[0.03] to-transparent">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
+                    <Bot size={18} className="text-purple-400" />
+                    Agentes Ativos
+                  </h3>
+                  <span className="text-[10px] font-black text-slate-500">{agents.length} MEMBROS</span>
+                </div>
+                <div className="space-y-3">
                   {agents.map((agent) => {
                     const color = agentColor(agent.id)
                     const live = runState?.agents?.find((a) => a.id === agent.id)
+                    const isActive = live?.status === 'working'
                     return (
-                      <div key={agent.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-[#0f1117] border border-[#2a2d3e]">
-                        <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base flex-shrink-0" style={{ background: `${color}18` }}>
+                      <div key={agent.id} className="flex items-center gap-4 p-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.07] transition-all group">
+                        <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-110 shadow-lg" style={{ background: `${color}18`, border: `1px solid ${color}25` }}>
                           {agent.icon}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-white truncate">{agent.name}</p>
-                          <p className="text-[10px] text-slate-600 truncate">{agent.role || agent.summary}</p>
+                          <p className="text-xs font-black text-white uppercase tracking-tight truncate">{agent.name}</p>
+                          <p className="text-[10px] text-slate-500 font-bold truncate uppercase tracking-tighter">{agent.role || agent.summary}</p>
                         </div>
-                        <span
-                          className="text-[9px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
-                          style={
-                            live?.status === 'working'
-                              ? { background: 'rgba(34,197,94,0.15)', color: '#4ade80' }
-                              : live?.status === 'done'
-                              ? { background: 'rgba(255,107,107,0.15)', color: '#ff6b6b' }
-                              : { background: 'rgba(255,255,255,0.05)', color: '#6b7280' }
-                          }
-                        >
-                          {live?.status ?? 'idle'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                           <span
+                            className="text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-sm"
+                            style={
+                              isActive
+                                ? { background: 'rgba(34,197,94,0.1)', color: '#4ade80', border: '1px solid rgba(52,211,153,0.2)' }
+                                : live?.status === 'done'
+                                ? { background: 'rgba(236,72,153,0.1)', color: '#ec4899', border: '1px solid rgba(236,72,153,0.2)' }
+                                : { background: 'rgba(255,255,255,0.03)', color: '#64748b', border: '1px solid rgba(255,255,255,0.05)' }
+                            }
+                          >
+                            {isActive ? 'WORKING' : (live?.status ?? 'IDLE')}
+                          </span>
+                          {isActive && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />}
+                        </div>
                       </div>
                     )
                   })}
@@ -248,30 +263,30 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
 
             {/* Live handoff */}
             {runState?.handoff && (
-              <div className="rounded-xl border border-coral/20 bg-coral/5 p-4 flex items-start gap-3">
-                <Bot size={16} className="text-coral mt-0.5 flex-shrink-0 animate-pulse" />
+              <div className="glass-panel p-6 border-purple-500/20 bg-purple-500/5 flex items-start gap-4 animate-pulse">
+                <Bot size={20} className="text-purple-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs font-semibold text-coral mb-0.5">
-                    Handoff em progresso: {runState.handoff.from} → {runState.handoff.to}
+                  <p className="text-xs font-black text-purple-400 mb-1 uppercase tracking-widest">
+                    Handoff: {runState.handoff.from} → {runState.handoff.to}
                   </p>
-                  <p className="text-xs text-slate-400">{runState.handoff.message}</p>
+                  <p className="text-xs text-slate-400 font-medium leading-relaxed">{runState.handoff.message}</p>
                 </div>
               </div>
             )}
 
             {/* Outputs preview */}
             {outputs.length > 0 && (
-              <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
-                <p className="text-xs font-semibold text-green-400 mb-2 flex items-center gap-2">
-                  <Target size={12} />
-                  Últimos outputs gerados
+              <div className="glass-panel p-6 border-emerald-500/10 bg-emerald-500/[0.02]">
+                <p className="text-[10px] font-black text-emerald-400 mb-4 flex items-center gap-2 uppercase tracking-[0.2em]">
+                  <Target size={14} />
+                  Últimos Outputs Gerados
                 </p>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {outputs.slice(0, 3).map((f) => (
-                    <div key={f.filename} className="flex items-center gap-2 text-xs">
-                      <FileText size={11} className="text-green-500 flex-shrink-0" />
-                      <span className="text-slate-400 font-mono">{f.filename}</span>
-                      <span className="ml-auto text-slate-600">{(f.sizeBytes / 1024).toFixed(1)}KB</span>
+                    <div key={f.filename} className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
+                      <FileText size={14} className="text-emerald-500 flex-shrink-0" />
+                      <span className="text-xs text-slate-400 font-mono truncate">{f.filename}</span>
+                      <span className="ml-auto text-[10px] font-bold text-slate-600 uppercase tracking-tighter">{(f.sizeBytes / 1024).toFixed(1)} KB</span>
                     </div>
                   ))}
                 </div>
@@ -282,72 +297,40 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
 
         {/* ─────────── Agentes ─────────── */}
         {activeTab === 'Agentes' && (
-          <div className="space-y-4 animate-fade-in">
-            <p className="text-xs text-slate-500">
-              {agents.length} agentes especializados no squad <strong className="text-white">{squad.name}</strong>
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
             {agents.map((agent) => {
               const color = agentColor(agent.id)
               const live = runState?.agents?.find((a) => a.id === agent.id)
               return (
-                <div key={agent.id} className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                  <div className="flex items-start gap-4">
+                <div key={agent.id} className="glass-panel p-8 glass-panel-interactive border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent">
+                  <div className="flex items-start gap-6">
                     <div
-                      className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl flex-shrink-0"
+                      className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-4xl flex-shrink-0 shadow-xl"
                       style={{ background: `${color}15`, border: `1px solid ${color}25` }}
                     >
                       {agent.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 flex-wrap">
+                      <div className="flex items-start justify-between gap-4">
                         <div>
-                          <h3 className="text-base font-bold text-white">{agent.name}</h3>
-                          <p className="text-xs text-slate-400 mt-0.5">{agent.role}</p>
+                          <h3 className="text-lg font-black text-white uppercase tracking-tight">{agent.name}</h3>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">{agent.role}</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {live && (
-                            <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-green-500/15 text-green-400 border border-green-500/20">
-                              {live.status}
-                            </span>
-                          )}
-                          <span
-                            className="text-[10px] font-medium px-2 py-1 rounded-full border"
-                            style={
-                              agent.execution?.includes('subagent')
-                                ? { background: 'rgba(155,89,255,0.12)', color: '#9b59ff', borderColor: 'rgba(155,89,255,0.25)' }
-                                : { background: 'rgba(255,255,255,0.05)', color: '#6b7280', borderColor: 'transparent' }
-                            }
-                          >
-                            {agent.execution?.includes('subagent') ? '⚡ subagent' : '→ inline'}
+                        {live && (
+                          <span className="text-[9px] font-black px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
+                            {live.status}
                           </span>
-                        </div>
+                        )}
                       </div>
 
-                      {agent.summary && (
-                        <p className="text-sm text-slate-400 mt-3 leading-relaxed">{agent.summary}</p>
-                      )}
+                      <p className="text-xs text-slate-400 mt-4 leading-relaxed font-medium">{agent.summary || 'Nenhuma descrição técnica fornecida.'}</p>
 
-                      {(agent.input || agent.output) && (
-                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {agent.input && (
-                            <div className="px-3 py-2.5 rounded-lg bg-[#0f1117] border border-[#2a2d3e]">
-                              <p className="text-[9px] font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Input</p>
-                              <p className="text-[11px] text-slate-400 font-mono break-all">{agent.input}</p>
-                            </div>
-                          )}
-                          {agent.output && (
-                            <div className="px-3 py-2.5 rounded-lg bg-[#0f1117] border border-[#2a2d3e]">
-                              <p className="text-[9px] font-semibold text-slate-600 uppercase tracking-wide mb-1.5">Output</p>
-                              <p className="text-[11px] text-slate-400 font-mono break-all">{agent.output}</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Skills indicator */}
-                      <div className="mt-3 flex items-center gap-2 flex-wrap">
-                        {squad.skills?.map((skill) => (
-                          <span key={skill} className="text-[9px] px-2 py-0.5 rounded bg-[#2a2d3e] text-slate-500 font-mono">
+                      <div className="mt-6 flex flex-wrap gap-2">
+                        <span className="text-[9px] font-black px-2 py-1 rounded bg-white/5 border border-white/5 text-slate-500 uppercase tracking-widest">
+                          {agent.execution?.includes('subagent') ? '⚡ NEXT-GEN SUBAGENT' : '→ INLINE CORE'}
+                        </span>
+                        {squad.skills?.slice(0, 3).map((skill) => (
+                          <span key={skill} className="text-[9px] font-black px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/10 uppercase tracking-widest">
                             {skill}
                           </span>
                         ))}
@@ -362,204 +345,144 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
 
         {/* ─────────── Pipeline ─────────── */}
         {activeTab === 'Pipeline' && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
             <PipelineBoard steps={steps} runState={runState} />
 
             {/* Checkpoints detail */}
             {checkpoints.length > 0 && (
-              <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                <p className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                  <CheckCircle2 size={14} className="text-yellow-400" />
-                  Checkpoints — pontos de decisão humana
-                  <span className="text-xs text-slate-500 ml-1">{checkpoints.length} no pipeline</span>
-                </p>
-                <div className="space-y-2">
+              <div className="glass-panel p-8 border-white/5">
+                <div className="flex items-center justify-between mb-8">
+                   <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
+                    <CheckCircle2 size={18} className="text-orange-400" />
+                    Pontos de Decisão (Checkpoints)
+                  </h3>
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{checkpoints.length} PONTOS</span>
+                </div>
+                <div className="space-y-3">
                   {checkpoints.map((cp) => (
-                    <div
-                      key={cp.filename}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5"
-                    >
-                      <span className="text-[10px] font-mono font-bold text-yellow-600 w-8 flex-shrink-0">
+                    <div key={cp.filename} className="flex items-center gap-4 p-4 rounded-2xl border border-orange-500/10 bg-orange-500/[0.03] hover:bg-orange-500/[0.05] transition-colors group">
+                      <span className="text-xs font-black text-orange-600 w-8 group-hover:scale-110 transition-transform">
                         {String(cp.stepNumber).padStart(2, '0')}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white">{cp.label}</p>
-                        <p className="text-[10px] text-slate-600 font-mono mt-0.5">{cp.filename}</p>
+                        <p className="text-xs font-black text-white uppercase tracking-wide">{cp.label}</p>
+                        <p className="text-[10px] text-slate-500 font-mono mt-0.5">{cp.filename}</p>
                       </div>
-                      <span className="text-[9px] font-bold px-2 py-1 rounded-full bg-yellow-500/15 text-yellow-500 border border-yellow-500/20 flex-shrink-0">
-                        CHECKPOINT
+                      <span className="text-[9px] font-black px-3 py-1 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 uppercase tracking-widest">
+                        Aprovação Necessária
                       </span>
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-xs text-slate-600 border-t border-[#2a2d3e] pt-3">
-                  Nos checkpoints, o pipeline pausa e aguarda sua aprovação antes de continuar.
-                </p>
               </div>
             )}
-
-            {/* Agent flow */}
-            <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-              <p className="text-sm font-semibold text-white mb-4">Fluxo de execução dos agentes</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                {agentSteps.map((step, idx) => {
-                  const matched = agents.find((a) =>
-                    step.label.toLowerCase().split(' ').some((w) => w.length > 3 && a.name.toLowerCase().includes(w))
-                  )
-                  const color = matched ? agentColor(matched.id) : '#4a4d5e'
-                  return (
-                    <div key={step.filename} className="flex items-center gap-2">
-                      <div
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium"
-                        style={{ background: `${color}12`, borderColor: `${color}25`, color }}
-                      >
-                        {matched?.icon && <span>{matched.icon}</span>}
-                        <span>{step.label}</span>
-                      </div>
-                      {idx < agentSteps.length - 1 && (
-                        <span className="text-slate-700 text-sm">→</span>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
           </div>
         )}
 
         {/* ─────────── Outputs ─────────── */}
         {activeTab === 'Outputs' && (
-          <div className="animate-fade-in">
-            <p className="text-xs text-slate-500 mb-4">
-              Arquivos gerados em <code className="text-coral bg-coral/10 px-1.5 py-0.5 rounded text-[10px]">squads/{squad.code}/output/</code>
-            </p>
+          <div className="animate-fade-in glass-panel p-8 border-white/5">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Repositório de Outputs</h3>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                Storage: <code className="text-purple-400 ml-1">outputs/</code>
+              </p>
+            </div>
             <OutputsList outputs={outputs} squadCode={squad.code} />
           </div>
         )}
 
         {/* ─────────── Brief ─────────── */}
         {activeTab === 'Brief' && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
             {!brief ? (
-              <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-8 text-center">
-                <BookOpen size={32} className="mx-auto text-slate-700 mb-3" />
-                <p className="text-sm text-slate-500">Nenhum client brief encontrado</p>
-                <p className="text-xs text-slate-600 mt-1">Adicione um arquivo em pipeline/data/client-brief-*.md</p>
+              <div className="glass-panel p-20 text-center border-white/5">
+                <BookOpen size={48} className="mx-auto text-slate-700 mb-6" />
+                <p className="text-sm font-black text-slate-500 uppercase tracking-[0.2em]">Nenhum Client Brief Encontrado</p>
+                <p className="text-xs text-slate-600 mt-2 font-medium italic">Adicione o arquivo estrategico no diretório correspondente.</p>
               </div>
             ) : (
               <>
                 {/* Identity */}
-                <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Identidade do cliente</p>
-                  <div className="flex items-start gap-4 flex-wrap">
-                    <div className="w-14 h-14 rounded-2xl bg-coral/10 border border-coral/20 flex items-center justify-center text-2xl">🎯</div>
+                <div className="glass-panel p-8 border-white/5 bg-gradient-to-br from-purple-500/[0.02] to-transparent">
+                  <div className="flex items-start gap-8 flex-wrap">
+                    <div className="w-20 h-20 rounded-[2rem] bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-4xl shadow-xl">🎯</div>
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-xl font-bold text-white">{brief.clientName}</h2>
-                      <p className="text-sm text-slate-500 mt-1">{brief.niche}</p>
-                      <div className="flex items-center gap-4 mt-2 flex-wrap">
-                        <span className="flex items-center gap-1.5 text-xs text-slate-400">
-                          <Instagram size={12} className="text-pink-400" />
-                          @{brief.instagram.split('—')[0].trim()}
+                      <h2 className="text-3xl font-black text-white uppercase tracking-tighter">{brief.clientName}</h2>
+                      <p className="text-sm text-slate-400 mt-2 font-bold uppercase tracking-widest">{brief.niche}</p>
+                      <div className="flex items-center gap-6 mt-6 flex-wrap">
+                        <span className="flex items-center gap-2 text-[11px] font-black text-pink-400 uppercase tracking-widest">
+                          <Instagram size={14} /> @{brief.instagram.split('—')[0].trim()}
                         </span>
-                        <span className="flex items-center gap-1.5 text-xs text-slate-400">
-                          <Play size={12} className="text-red-400" />
-                          @{brief.youtube.split('—')[0].trim()}
+                        <span className="flex items-center gap-2 text-[11px] font-black text-red-500 uppercase tracking-widest">
+                          <Play size={14} /> @{brief.youtube.split('—')[0].trim()}
                         </span>
-                        <span className="text-xs text-slate-500">Operador: {brief.operator}</span>
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest border-l border-white/10 pl-6">Operador: {brief.operator}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Product + Goals */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                    <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-3">Produto principal</p>
-                    <p className="text-lg font-bold text-white">{brief.product.name}</p>
-                    <p className="text-2xl font-bold text-coral mt-1">{brief.product.price}</p>
-                    <p className="text-xs text-slate-500 mt-1">por ano · 1 ano de acompanhamento</p>
-                  </div>
-                  <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                    <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-3">Meta Instagram</p>
-                    <p className="text-4xl font-bold text-white">500k</p>
-                    <p className="text-xs text-slate-500 mt-2">seguidores · 6 meses</p>
-                    {brief.cadence && <p className="text-[10px] text-slate-600 mt-1">{brief.cadence}</p>}
-                  </div>
-                  <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                    <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-3">Meta YouTube</p>
-                    <p className="text-4xl font-bold text-white">100k</p>
-                    <p className="text-xs text-slate-500 mt-2">inscritos · 6 meses</p>
-                  </div>
+                {/* Goals */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    { label: 'Produto Principal', val: brief.product.name, sub: brief.product.price, sub2: 'Contrato Anual', color: 'text-purple-400' },
+                    { label: 'Meta Instagram', val: '500k', sub: 'Seguidores', sub2: 'Horizonte 6 meses', color: 'text-pink-400' },
+                    { label: 'Meta YouTube', val: '100k', sub: 'Inscritos', sub2: 'Crescimento Orgânico', color: 'text-red-400' },
+                  ].map(g => (
+                    <div key={g.label} className="glass-panel p-8 border-white/5 relative overflow-hidden">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">{g.label}</p>
+                      <p className={cn("text-3xl font-black uppercase tracking-tight", g.color)}>{g.val}</p>
+                      <p className="text-xl font-black text-white mt-1">{g.sub}</p>
+                      <p className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter mt-2">{g.sub2}</p>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Método EGO */}
-                <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Método EGO — Framework autoral</p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Framework EGO */}
+                <div className="glass-panel p-8 border-white/5">
+                  <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] mb-8">Framework Estratégico: Método EGO</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
-                      { k: 'E', label: 'Essência', color: '#ff6b6b', text: brief.egoMethod.E },
-                      { k: 'G', label: 'Generosidade', color: '#22c55e', text: brief.egoMethod.G },
-                      { k: 'O', label: 'Ousadia', color: '#9b59ff', text: brief.egoMethod.O },
-                    ].map(({ k, label, color, text }) => (
-                      <div key={k} className="rounded-xl p-4 border" style={{ background: `${color}08`, borderColor: `${color}20` }}>
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold" style={{ background: `${color}20`, color }}>{k}</span>
-                          <p className="text-sm font-bold text-white">{label}</p>
+                      { k: 'E', label: 'Essência', color: 'text-pink-400', bg: 'rgba(236,72,153,0.1)', border: 'rgba(236,72,153,0.2)', text: brief.egoMethod.E },
+                      { k: 'G', label: 'Generosidade', color: 'text-emerald-400', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.2)', text: brief.egoMethod.G },
+                      { k: 'O', label: 'Ousadia', color: 'text-purple-400', bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.2)', text: brief.egoMethod.O },
+                    ].map(({ k, label, color, bg, border, text }) => (
+                      <div key={k} className="glass-panel p-6 border shadow-inner" style={{ background: bg, borderColor: border }}>
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className={cn("w-10 h-10 rounded-xl flex items-center justify-center text-lg font-black shadow-lg", color)} style={{ background: 'rgba(255,255,255,0.05)' }}>{k}</span>
+                          <p className="text-xs font-black text-white uppercase tracking-wider">{label}</p>
                         </div>
-                        <p className="text-xs text-slate-400 leading-relaxed">{text}</p>
+                        <p className="text-xs text-slate-400 leading-relaxed font-medium">{text}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Audience + Pain points */}
-                {(brief.audience.length > 0 || brief.painPoints.length > 0) && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {brief.audience.length > 0 && (
-                      <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Personas da audiência</p>
-                        <div className="space-y-2">
-                          {brief.audience.map((a, i) => (
-                            <div key={i} className="flex items-start gap-2.5 px-3 py-2 rounded-lg bg-[#0f1117] border border-[#2a2d3e]">
-                              <span className="text-xs font-bold text-coral flex-shrink-0">{i + 1}.</span>
-                              <p className="text-xs text-slate-400 leading-relaxed">{a}</p>
-                            </div>
-                          ))}
+                {/* Audience + Content */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="glass-panel p-8 border-white/5">
+                    <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6">Personas Alvo</h3>
+                    <div className="space-y-3">
+                      {brief.audience.map((a, i) => (
+                        <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] transition-colors">
+                          <span className="text-xs font-black text-purple-600">{i + 1}</span>
+                          <p className="text-xs text-slate-400 font-medium leading-relaxed">{a}</p>
                         </div>
-                      </div>
-                    )}
-                    {brief.painPoints.length > 0 && (
-                      <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Dores principais</p>
-                        <div className="space-y-2">
-                          {brief.painPoints.map((pain, i) => (
-                            <div key={i} className="flex items-start gap-2.5 px-3 py-2 rounded-lg bg-[#0f1117] border border-[#2a2d3e]">
-                              <Target size={11} className="text-coral mt-0.5 flex-shrink-0" />
-                              <p className="text-xs text-slate-400 leading-relaxed">{pain}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      ))}
+                    </div>
                   </div>
-                )}
-
-                {/* Content pillars */}
-                {brief.contentPillars.length > 0 && (
-                  <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Pilares de conteúdo</p>
+                  <div className="glass-panel p-8 border-white/5">
+                    <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6">Pilares de Conteúdo</h3>
                     <div className="flex flex-wrap gap-2">
-                      {brief.contentPillars.map((pillar, i) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-coral/10 text-coral border border-coral/20"
-                        >
+                       {brief.contentPillars.map((pillar, i) => (
+                        <span key={i} className="px-4 py-2 rounded-xl text-[10px] font-black bg-white/5 text-slate-400 border border-white/10 uppercase tracking-widest hover:text-white hover:border-purple-500/50 transition-all cursor-default">
                           {pillar}
                         </span>
                       ))}
                     </div>
                   </div>
-                )}
+                </div>
               </>
             )}
           </div>

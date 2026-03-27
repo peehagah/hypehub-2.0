@@ -1,291 +1,257 @@
-import Link from 'next/link'
-import { ArrowRight, Bot, GitBranch, Instagram, Play, Target, Zap } from 'lucide-react'
-import { listSquads, loadAgents, loadClientBrief, getPipelineSteps, listOutputs } from '@/lib/squads'
-import { agentColor } from '@/lib/utils'
-import { PipelineRunner } from '@/components/pipeline-runner'
+import { 
+  Bot, 
+  Instagram, 
+  Zap, 
+  Target, 
+  TrendingUp, 
+  Users, 
+  LayoutGrid, 
+  Search,
+  CheckCircle2,
+  Clock,
+  ArrowUpRight,
+  Monitor
+} from 'lucide-react'
+import { listSquads } from '@/lib/squads'
 
 export default function DashboardPage() {
   const squads = listSquads()
 
-  // Pre-load data for each squad to show on the dashboard
-  const squadsWithData = squads.map((squad) => ({
-    squad,
-    agents: loadAgents(squad.code),
-    steps: getPipelineSteps(squad.code),
-    outputs: listOutputs(squad.code),
-    brief: loadClientBrief(squad.code),
-  }))
+  // Mock data for the Premium Feel based on user request
+  const instagramMetrics = {
+    followers: '128.4k',
+    reach: '+12.5%',
+    engagement: '5.2%',
+    postsToday: 3,
+    totalPosts: 12
+  }
 
-  const totalAgents = squadsWithData.reduce((sum, s) => sum + s.agents.length, 0)
-  const totalSteps = squadsWithData.reduce((sum, s) => sum + s.steps.length, 0)
-  const totalOutputs = squadsWithData.reduce((sum, s) => sum + s.outputs.length, 0)
+  const agentTasks = [
+    { id: 1, agent: 'Estrategista', task: 'Análise de tendências concluída', time: '12min atrás' },
+    { id: 2, agent: 'Copywriter', task: 'Legendas para Reels geradas', time: '45min atrás' },
+    { id: 3, agent: 'Designer', task: 'Carrossel "Método EGO" finalizado', time: '1h atrás' },
+  ]
+
+  const competitorInsights = [
+    { name: 'Concorrente A', status: 'Postou novo Reels', impact: 'Alto' },
+    { name: 'Concorrente B', status: 'Mudança na Bio detectada', impact: 'Médio' },
+  ]
 
   return (
-    <div className="p-4 md:p-6 space-y-8 max-w-[1400px] mx-auto">
+    <div className="min-h-screen p-6 lg:p-10 space-y-10 animate-fade-in max-w-[1600px] mx-auto pb-24">
+      
+      {/* ── Header Area ── */}
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white">
+            Overview <span className="text-purple-500 italic">Pedro</span>
+          </h1>
+          <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">
+            HypeHUB NEO · IA Hub · {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <div className="glass-panel px-4 py-2 flex items-center gap-2 border-white/5">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">Scraper Ativo</span>
+          </div>
+          <button className="glass-panel p-2 border-white/10 hover:bg-white/5 transition-colors">
+            <Search size={18} className="text-slate-400" />
+          </button>
+        </div>
+      </header>
 
-      {/* ── Header ── */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">
-          <span className="gradient-text">Opensquad</span>
-          <span className="text-slate-500 font-normal text-lg ml-3">· Agent Pipeline Platform</span>
-        </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          {new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}
-        </p>
-      </div>
-
-      {/* ── Stats strip ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* ── Top Stats Grid ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Squads', value: squads.length, icon: Zap, color: '#ff6b6b', sub: 'pipelines ativos' },
-          { label: 'Agentes', value: totalAgents, icon: Bot, color: '#ff4dca', sub: 'especializados' },
-          { label: 'Pipeline steps', value: totalSteps, icon: GitBranch, color: '#9b59ff', sub: 'checkpoints incluídos' },
-          { label: 'Outputs gerados', value: totalOutputs, icon: Target, color: '#3b82f6', sub: 'arquivos em output/' },
-        ].map(({ label, value, icon: Icon, color, sub }) => (
-          <div key={label} className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wide">{label}</p>
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${color}20` }}>
-                <Icon size={13} style={{ color }} />
+          { label: 'Alcance 24h', value: '1.2M', trend: '+14%', icon: TrendingUp, color: 'text-emerald-400' },
+          { label: 'Posts Hoje', value: instagramMetrics.postsToday, trend: 'Meta: 5', icon: Instagram, color: 'text-pink-400' },
+          { label: 'Tasks IA', value: '24', trend: '100% Sucesso', icon: Bot, color: 'text-purple-400' },
+          { label: 'Engajamento', value: '8.4%', trend: 'Acima da média', icon: Zap, color: 'text-orange-400' },
+        ].map((stat, i) => (
+          <div key={i} className="glass-panel p-6 glass-panel-interactive relative overflow-hidden group">
+            <div className="flex justify-between items-start mb-4">
+              <div className={cn("p-2 rounded-xl bg-white/5 border border-white/5", stat.color)}>
+                <stat.icon size={20} />
               </div>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{stat.label}</span>
             </div>
-            <p className="text-2xl font-bold text-white">{value}</p>
-            <p className="text-[10px] text-slate-600 mt-0.5">{sub}</p>
+            <div className="flex items-baseline gap-2">
+              <h3 className="text-3xl font-black text-white">{stat.value}</h3>
+              <span className={cn("text-[10px] font-bold", stat.color)}>{stat.trend}</span>
+            </div>
+            {/* Background Glow Deco */}
+            <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-colors"></div>
           </div>
         ))}
       </div>
 
-      {/* ── Squad cards ── */}
-      {squadsWithData.map(({ squad, agents, steps, outputs, brief }) => (
-        <div key={squad.code} className="space-y-6">
-
-          {/* Squad header */}
-          <div className="flex items-start justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-4">
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-                style={{ background: 'rgba(255,107,107,0.12)', border: '1px solid rgba(255,107,107,0.2)' }}
-              >
-                {squad.icon}
-              </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* ── Left Column: Metrics & Content (8 cols) ── */}
+        <div className="lg:col-span-8 space-y-6">
+          
+          {/* Main Visual Metric: Engagement Chart Placeholder Area */}
+          <div className="glass-panel p-8 min-h-[400px] flex flex-col justify-between border-white/5 bg-gradient-to-br from-white/[0.03] to-transparent">
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-white">{squad.name}</h2>
-                  <span className="text-[10px] font-mono text-slate-600 bg-[#2a2d3e] px-2 py-0.5 rounded">
-                    {squad.code}
-                  </span>
-                </div>
-                <p className="text-sm text-slate-500 mt-0.5 max-w-xl">{squad.description}</p>
+                <h3 className="text-xl font-black text-white">Engajamento Semanal</h3>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Performance por Postagem</p>
+              </div>
+              <div className="flex gap-2">
+                <button className="text-[10px] font-black text-white px-3 py-1 bg-white/10 rounded-full border border-white/10">Views</button>
+                <button className="text-[10px] font-black text-slate-500 px-3 py-1 hover:text-white transition-colors">Likes</button>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <PipelineRunner squadCode={squad.code} squadName={squad.name} />
-              <Link
-                href={`/squad/${squad.code}`}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium gradient-bg text-white hover:opacity-90 transition-opacity"
-              >
-                Ver squad completo
-                <ArrowRight size={14} />
-              </Link>
+            
+            <div className="flex-1 flex items-end gap-2 px-2 pb-4">
+              {/* Animated Bars Mockup */}
+              {[40, 70, 45, 90, 65, 80, 50, 85, 60, 95].map((h, i) => (
+                <div key={i} className="flex-1 group relative cursor-pointer">
+                  <div 
+                    className="w-full bg-gradient-to-t from-purple-500/20 to-purple-500 rounded-t-lg transition-all duration-500 group-hover:to-pink-400 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]"
+                    style={{ height: `${h}%` }}
+                  ></div>
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 glass-panel px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                    <span className="text-[10px] font-bold text-white tracking-widest">{(h * 1234).toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="pt-6 border-t border-white/5 flex justify-between items-center">
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Últimos 10 Dias de Operação</p>
+              <div className="flex items-center gap-1 text-emerald-400 font-black text-xs">
+                <ArrowUpRight size={14} />
+                +24.8% CRESCIMENTO
+              </div>
             </div>
           </div>
 
-          {/* Client context (if brief loaded) */}
-          {brief && (
-            <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-              <div className="flex items-start justify-between flex-wrap gap-4">
-                {/* Client identity */}
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-brand-subtle border border-coral/20 flex items-center justify-center text-xl flex-shrink-0">
-                    🎯
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Cliente</p>
-                    <h3 className="text-base font-bold text-white">{brief.clientName}</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">{brief.niche}</p>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className="flex items-center gap-1 text-xs text-slate-400">
-                        <Instagram size={11} className="text-pink-400" />
-                        @{brief.instagram.split('—')[0].trim()}
-                      </span>
-                      <span className="flex items-center gap-1 text-xs text-slate-400">
-                        <Play size={11} className="text-red-400" />
-                        @{brief.youtube.split('—')[0].trim()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Goals */}
-                <div className="flex items-center gap-3">
-                  <div className="text-center px-4 py-3 rounded-xl border border-[#2a2d3e] bg-[#0f1117]">
-                    <p className="text-[10px] text-slate-600 uppercase mb-1">Meta Instagram</p>
-                    <p className="text-lg font-bold text-white">500k</p>
-                    <p className="text-[10px] text-slate-600">em 6 meses</p>
-                  </div>
-                  <div className="text-center px-4 py-3 rounded-xl border border-[#2a2d3e] bg-[#0f1117]">
-                    <p className="text-[10px] text-slate-600 uppercase mb-1">Meta YouTube</p>
-                    <p className="text-lg font-bold text-white">100k</p>
-                    <p className="text-[10px] text-slate-600">inscritos</p>
-                  </div>
-                  <div className="text-center px-4 py-3 rounded-xl border border-[#2a2d3e] bg-[#0f1117]">
-                    <p className="text-[10px] text-slate-600 uppercase mb-1">Produto</p>
-                    <p className="text-lg font-bold text-white">R$10–12k</p>
-                    <p className="text-[10px] text-slate-600">mentoria/ano</p>
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Completed Tasks */}
+            <div className="glass-panel p-6 border-white/5">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-purple-400" /> Tasks Concluídas
+                </h3>
+                <span className="text-[10px] font-bold text-slate-500">HOJE</span>
               </div>
-
-              {/* Método EGO */}
-              <div className="mt-5 pt-4 border-t border-[#2a2d3e]">
-                <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-3">Método EGO</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {[
-                    { key: 'E', label: 'Essência', color: '#ff6b6b', text: brief.egoMethod.E },
-                    { key: 'G', label: 'Generosidade', color: '#22c55e', text: brief.egoMethod.G },
-                    { key: 'O', label: 'Ousadia', color: '#9b59ff', text: brief.egoMethod.O },
-                  ].map(({ key, label, color, text }) => (
-                    <div
-                      key={key}
-                      className="flex items-start gap-3 px-3 py-3 rounded-xl border"
-                      style={{ background: `${color}08`, borderColor: `${color}20` }}
-                    >
-                      <span
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0"
-                        style={{ background: `${color}20`, color }}
-                      >
-                        {key}
-                      </span>
+              <div className="space-y-4">
+                {agentTasks.map(t => (
+                  <div key={t.id} className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/[0.07] transition-colors cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-purple-500/20 flex items-center justify-center text-xs font-black text-purple-400">
+                        {t.agent[0]}
+                      </div>
                       <div>
-                        <p className="text-xs font-semibold text-white">{label}</p>
-                        <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed line-clamp-2">{text}</p>
+                        <p className="text-xs font-bold text-white leading-none">{t.task}</p>
+                        <p className="text-[10px] text-slate-500 mt-1">{t.agent}</p>
                       </div>
                     </div>
-                  ))}
+                    <span className="text-[9px] font-bold text-slate-600 italic whitespace-nowrap">{t.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Competitor Scraper */}
+            <div className="glass-panel p-6 border-white/5">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <Search size={16} className="text-orange-400" /> Radar Concorrência
+                </h3>
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-orange-500/10 border border-orange-500/20">
+                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
+                  <span className="text-[8px] font-black text-orange-400 uppercase tracking-widest leading-none">Scanning</span>
+                </div>
+              </div>
+              <div className="space-y-4 text-[11px]">
+                {competitorInsights.map((c, i) => (
+                  <div key={i} className="flex gap-4 items-start border-b border-white/5 pb-4 last:border-0">
+                    <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-400">
+                      <Monitor size={14} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between">
+                        <p className="font-black text-white uppercase tracking-tighter">{c.name}</p>
+                        <span className="text-[9px] font-black text-slate-500">{c.impact} IMPACTO</span>
+                      </div>
+                      <p className="text-slate-400 mt-0.5 font-medium">{c.status}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Right Column: Instagram Preview & Squads (4 cols) ── */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          {/* Instagram Post Count Widget */}
+          <div className="glass-panel p-8 border-white/5 relative overflow-hidden bg-gradient-to-br from-pink-500/10 to-transparent">
+            <Instagram size={40} className="absolute -top-4 -right-4 text-pink-500/10 rotate-12" />
+            <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8">Posts no Dia</h3>
+            <div className="flex justify-center items-center py-6">
+              <div className="relative w-40 h-40 flex items-center justify-center">
+                <svg className="w-full h-full -rotate-90">
+                  <circle cx="80" cy="80" r="70" className="stroke-white/5 fill-none" strokeWidth="12" />
+                  <circle 
+                    cx="80" cy="80" r="70" 
+                    className="stroke-pink-500 fill-none transition-all duration-1000" 
+                    strokeWidth="12" 
+                    strokeDasharray="440" 
+                    strokeDashoffset={440 - (440 * (instagramMetrics.postsToday / 5))}
+                    strokeLinecap="round"
+                    style={{ filter: 'drop-shadow(0 0 8px rgba(236, 72, 153, 0.5))' }}
+                  />
+                </svg>
+                <div className="absolute text-center">
+                  <p className="text-4xl font-black text-white leading-none">{instagramMetrics.postsToday}</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">de 5 Meta</p>
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Agents grid */}
-          <div>
-            <p className="text-xs font-semibold text-slate-400 mb-3 flex items-center gap-2">
-              <Bot size={13} />
-              Agentes do squad
-              <span className="text-slate-600">· {agents.length} especializados</span>
+            <p className="text-center text-[10px] font-bold text-slate-500 mt-4 leading-relaxed tracking-wide">
+              Faltam <span className="text-pink-400">2 posts</span> para bater a meta<br/>definida pelo Agente Estratégico.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-              {agents.map((agent) => {
-                const color = agentColor(agent.id)
-                return (
-                  <div
-                    key={agent.id}
-                    className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-4 hover:border-[#3a3d4e] transition-colors"
-                  >
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-3"
-                      style={{ background: `${color}18`, border: `1px solid ${color}25` }}
-                    >
-                      {agent.icon}
-                    </div>
-                    <p className="text-xs font-semibold text-white leading-tight">{agent.name}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed line-clamp-2">{agent.role || agent.summary}</p>
-                    <div className="mt-3 flex items-center gap-1.5">
-                      <span
-                        className="text-[9px] font-medium px-1.5 py-0.5 rounded border"
-                        style={{
-                          background: agent.execution?.includes('subagent') ? 'rgba(155,89,255,0.12)' : 'rgba(255,255,255,0.05)',
-                          color: agent.execution?.includes('subagent') ? '#9b59ff' : '#6b7280',
-                          borderColor: agent.execution?.includes('subagent') ? 'rgba(155,89,255,0.2)' : 'transparent',
-                        }}
-                      >
-                        {agent.execution?.includes('subagent') ? 'subagent' : 'inline'}
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
           </div>
 
-          {/* Pipeline quick view */}
-          <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-5">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm font-semibold text-white flex items-center gap-2">
-                <GitBranch size={14} className="text-slate-400" />
-                Pipeline — {steps.length} steps
-              </p>
-              <Link
-                href={`/squad/${squad.code}#pipeline`}
-                className="text-xs text-coral hover:text-coral-light transition-colors"
-              >
-                Ver completo →
-              </Link>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {steps.map((step, idx) => {
-                const isCheckpoint = step.isCheckpoint
-                return (
-                  <div key={step.filename} className="flex items-center gap-1.5">
-                    <div
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-medium border"
-                      style={
-                        isCheckpoint
-                          ? { background: 'rgba(245,158,11,0.1)', borderColor: 'rgba(245,158,11,0.2)', color: '#f59e0b' }
-                          : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)', color: '#94a3b8' }
-                      }
-                    >
-                      <span className="font-mono opacity-60">{String(step.stepNumber).padStart(2, '0')}</span>
-                      <span className="ml-1 max-w-[90px] truncate">{step.label}</span>
+          {/* Active Squads Quick List */}
+          <div className="glass-panel p-6 border-white/5">
+             <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
+                <Users size={16} className="text-cyan-400" /> Squads Ativos
+             </h3>
+             <div className="space-y-3">
+                {squads.map(s => (
+                  <div key={s.code} className="flex items-center gap-4 p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/[0.08] transition-all cursor-pointer group">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                      {s.icon}
                     </div>
-                    {idx < steps.length - 1 && (
-                      <span className="text-slate-800 text-xs">›</span>
-                    )}
+                    <div className="flex-1">
+                      <p className="text-xs font-black text-white tracking-wide uppercase">{s.name}</p>
+                      <p className="text-[9px] font-bold text-slate-500 tracking-widest mt-0.5">ESTADO: OPERANDO</p>
+                    </div>
+                    <ArrowUpRight size={14} className="text-slate-600 group-hover:text-cyan-400" />
                   </div>
-                )
-              })}
-            </div>
+                ))}
+             </div>
+             <button className="w-full mt-6 py-3 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all">
+                Configurar Novos Agentes
+             </button>
           </div>
 
-          {/* Outputs */}
-          {outputs.length > 0 ? (
-            <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4 flex items-center gap-3">
-              <Target size={16} className="text-green-400 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-semibold text-white">
-                  {outputs.length} output{outputs.length !== 1 ? 's' : ''} gerado{outputs.length !== 1 ? 's' : ''}
-                </p>
-                <p className="text-xs text-slate-500">{outputs.map((o) => o.filename).join(', ')}</p>
-              </div>
-              <Link
-                href={`/squad/${squad.code}`}
-                className="ml-auto text-xs text-green-400 hover:text-green-300 transition-colors flex items-center gap-1"
-              >
-                Ver outputs <ArrowRight size={11} />
-              </Link>
-            </div>
-          ) : (
-            <div className="rounded-xl border border-[#2a2d3e] bg-[#0f1117] p-4 flex items-center gap-3">
-              <Target size={14} className="text-slate-700 flex-shrink-0" />
-              <p className="text-xs text-slate-600">
-                Nenhum output gerado ainda — execute o pipeline com{' '}
-                <code className="text-coral bg-coral/10 px-1 py-0.5 rounded text-[10px]">/opensquad run {squad.code}</code>
-              </p>
-            </div>
-          )}
         </div>
-      ))}
 
-      {/* Empty state */}
-      {squads.length === 0 && (
-        <div className="rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-12 text-center">
-          <Zap size={40} className="mx-auto text-slate-700 mb-4" />
-          <p className="text-slate-400 font-medium mb-2">Nenhum squad encontrado</p>
-          <p className="text-slate-600 text-sm mb-4">
-            Use <code className="text-coral bg-coral/10 px-1.5 py-0.5 rounded">/opensquad create</code> no seu IDE para criar um squad
-          </p>
-        </div>
-      )}
+      </div>
+
     </div>
   )
+}
+
+function cn(...classes: any[]) {
+  return classes.filter(Boolean).join(' ')
 }
