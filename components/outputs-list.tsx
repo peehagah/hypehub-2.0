@@ -67,7 +67,10 @@ export function OutputsList({ outputs, squadCode }: OutputsListProps) {
                 <FileText size={18} className="text-purple-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-white uppercase tracking-tight truncate">{file.filename}</p>
+                <p className="text-xs font-black text-white uppercase tracking-tight truncate">
+                  {file.filename.split('/').pop() ?? file.filename}
+                </p>
+                <p className="text-[9px] font-mono text-slate-600 truncate mt-0.5">{file.filename}</p>
                 <div className="flex items-center gap-4 mt-1">
                   <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1 uppercase tracking-tighter">
                     <Clock size={10} className="text-slate-600" />

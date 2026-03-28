@@ -93,7 +93,7 @@ export function SquadDetailClient({ squad, agents, steps, outputs, brief }: Squa
           <p className="text-slate-400 text-sm mt-2 font-medium leading-relaxed max-w-2xl">{squad.description}</p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
-          <WsIndicator onStateUpdate={handleStateUpdate} onDisconnect={handleDisconnect} />
+          <WsIndicator squadCode={squad.code} onStateUpdate={handleStateUpdate} onDisconnect={handleDisconnect} />
           <PipelineRunner squadCode={squad.code} squadName={squad.name} />
           <div className="flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />

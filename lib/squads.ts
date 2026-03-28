@@ -110,25 +110,34 @@ function loadAgent(
 // ── Outputs ────────────────────────────────────────────────────────────────
 
 export function listOutputs(squadCode: string): OutputFile[] {
-  const dir = path.join(SQUADS_DIR, squadCode, 'output')
-  if (!fs.existsSync(dir)) return []
+  const outputDir = path.join(SQUADS_DIR, squadCode, 'output')
+  if (!fs.existsSync(outputDir)) return []
 
-  return fs
-    .readdirSync(dir)
-    .filter((f) => !f.startsWith('.') && f.endsWith('.md'))
-    .map((filename) => {
-      const stat = fs.statSync(path.join(dir, filename))
-      return {
-        filename,
-        sizeBytes: stat.size,
-        modifiedAt: stat.mtime.toISOString(),
+  const results: OutputFile[] = []
+
+  function walk(dir: string, relBase: string) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true })
+    for (const entry of entries) {
+      if (entry.name.startsWith('.')) continue
+      const fullPath = path.join(dir, entry.name)
+      const relPath = relBase ? `${relBase}/${entry.name}` : entry.name
+      if (entry.isDirectory()) {
+        walk(fullPath, relPath)
+      } else if (entry.name.endsWith('.md')) {
+        const stat = fs.statSync(fullPath)
+        results.push({ filename: relPath, sizeBytes: stat.size, modifiedAt: stat.mtime.toISOString() })
       }
-    })
-    .sort((a, b) => new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime())
+    }
+  }
+
+  walk(outputDir, '')
+  return results.sort((a, b) => new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime())
 }
 
-export function readOutput(squadCode: string, filename: string): string | null {
-  const file = path.join(SQUADS_DIR, squadCode, 'output', filename)
+export function readOutput(squadCode: string, relativePath: string): string | null {
+  const outputDir = path.join(SQUADS_DIR, squadCode, 'output')
+  const file = path.resolve(outputDir, relativePath)
+  if (!file.startsWith(outputDir)) return null
   if (!fs.existsSync(file)) return null
   return fs.readFileSync(file, 'utf-8')
 }

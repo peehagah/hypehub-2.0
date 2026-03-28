@@ -1,81 +1,75 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Wifi, WifiOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { WsMessage, SquadRunState } from '@/lib/types'
+import type { SquadRunState } from '@/lib/types'
 
 interface WsIndicatorProps {
+  squadCode: string
   onStateUpdate?: (squad: string, state: SquadRunState) => void
   onDisconnect?: (squad: string) => void
 }
 
-export function WsIndicator({ onStateUpdate, onDisconnect }: WsIndicatorProps) {
-  const [connected, setConnected] = useState(false)
-  const wsRef = useRef<WebSocket | null>(null)
-  const retryRef = useRef(1000)
-  const disposedRef = useRef(false)
+export function WsIndicator({ squadCode, onStateUpdate, onDisconnect }: WsIndicatorProps) {
+  const [live, setLive] = useState(false)
+  const activeRef = useRef(true)
 
   useEffect(() => {
-    disposedRef.current = false
+    activeRef.current = true
 
-    function connect() {
-      if (disposedRef.current) return
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const ws = new WebSocket(`${protocol}//${window.location.host}/__squads_ws`)
-      wsRef.current = ws
-
-      ws.onopen = () => {
-        setConnected(true)
-        retryRef.current = 1000
-      }
-
-      ws.onmessage = (ev) => {
-        try {
-          const msg: WsMessage = JSON.parse(ev.data)
-          if ((msg.type === 'SQUAD_ACTIVE' || msg.type === 'SQUAD_UPDATE') && onStateUpdate) {
-            onStateUpdate(msg.squad, msg.state)
+    async function poll() {
+      if (!activeRef.current) return
+      try {
+        const res = await fetch(`/api/squads/${squadCode}/state`, { cache: 'no-store' })
+        if (!activeRef.current) return
+        if (res.ok) {
+          const state: SquadRunState | null = await res.json()
+          if (state && state.status === 'running') {
+            setLive(true)
+            onStateUpdate?.(squadCode, state)
+          } else if (state) {
+            setLive(false)
+            onStateUpdate?.(squadCode, state)
+          } else {
+            setLive(false)
+            onDisconnect?.(squadCode)
           }
-          if (msg.type === 'SQUAD_INACTIVE' && onDisconnect) {
-            onDisconnect(msg.squad)
-          }
-        } catch {/* ignore */}
-      }
-
-      ws.onclose = () => {
-        setConnected(false)
-        if (!disposedRef.current) {
-          setTimeout(connect, Math.min(retryRef.current, 30000))
-          retryRef.current *= 2
+        } else {
+          setLive(false)
+          onDisconnect?.(squadCode)
+        }
+      } catch {
+        if (activeRef.current) {
+          setLive(false)
+          onDisconnect?.(squadCode)
         }
       }
-
-      ws.onerror = () => ws.close()
     }
 
-    connect()
+    poll()
+    const interval = setInterval(poll, 2000)
 
     return () => {
-      disposedRef.current = true
-      wsRef.current?.close()
+      activeRef.current = false
+      clearInterval(interval)
     }
-  }, [onStateUpdate, onDisconnect])
+  }, [squadCode, onStateUpdate, onDisconnect])
 
   return (
     <div
       className={cn(
         'flex items-center gap-2 px-3 py-1.5 rounded-2xl text-[10px] font-black border transition-all duration-500 uppercase tracking-widest',
-        connected
+        live
           ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
           : 'bg-white/[0.03] text-slate-500 border-white/5'
       )}
-      title={connected ? 'Stream de Dados Ativo' : 'Stream de Dados Desconectado'}
+      title={live ? 'Pipeline em execução' : 'Aguardando execução'}
     >
       <div className={cn(
-        "w-1.5 h-1.5 rounded-full shadow-sm",
-        connected ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" : "bg-slate-700"
+        'w-1.5 h-1.5 rounded-full',
+        live ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-slate-700'
       )} />
-      {connected ? 'LIVE' : 'OFFLINE'}
+      {live ? 'LIVE' : 'IDLE'}
     </div>
   )
 }
