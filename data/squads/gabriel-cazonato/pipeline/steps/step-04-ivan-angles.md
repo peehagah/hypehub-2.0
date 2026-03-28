@@ -5,9 +5,9 @@ agent: ivan-instagram
 execution: inline
 phase: A
 inputFile:
-  - squads/influencer-hub/output/trends-brief.md
+  - squads/gabriel-cazonato/output/trends-brief.md
   - tema selecionado no checkpoint (step-03)
-outputFile: squads/influencer-hub/output/angles.md
+outputFile: squads/gabriel-cazonato/output/angles.md
 ---
 
 # Step 04: Ivan Instagram (Fase A) — Geração de Ângulos

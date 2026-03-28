@@ -3,8 +3,8 @@ task: create-reel-script
 order: 3
 agent: ivan-instagram
 phase: B
-input: squads/influencer-hub/output/angles.md + ângulo selecionado
-output: squads/influencer-hub/output/instagram-content.md (seção reel)
+input: squads/gabriel-cazonato/output/angles.md + ângulo selecionado
+output: squads/gabriel-cazonato/output/instagram-content.md (seção reel)
 ---
 
 # Task: Criar Script de Reel

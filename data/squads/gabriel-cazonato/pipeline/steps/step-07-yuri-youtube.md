@@ -5,9 +5,9 @@ agent: yuri-youtube
 execution: subagent
 model_tier: powerful
 inputFile:
-  - squads/influencer-hub/output/angles.md
+  - squads/gabriel-cazonato/output/angles.md
   - ângulo selecionado no checkpoint (step-05)
-outputFile: squads/influencer-hub/output/youtube-content.md
+outputFile: squads/gabriel-cazonato/output/youtube-content.md
 format: youtube-script
 parallel: step-06-ivan-create.md
 ---

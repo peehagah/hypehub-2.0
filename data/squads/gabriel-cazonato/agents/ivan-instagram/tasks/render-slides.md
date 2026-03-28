@@ -3,7 +3,7 @@ task: render-slides
 order: 4
 agent: ivan-instagram
 phase: B
-input: squads/influencer-hub/output/instagram-content.md (seção carousel)
+input: squads/gabriel-cazonato/output/instagram-content.md (seção carousel)
 output: HTML slides para renderização via image-creator skill
 ---
 

@@ -6,9 +6,9 @@ execution: subagent
 phase: B
 model_tier: powerful
 inputFile:
-  - squads/influencer-hub/output/angles.md
+  - squads/gabriel-cazonato/output/angles.md
   - ângulo selecionado no checkpoint (step-05)
-outputFile: squads/influencer-hub/output/instagram-content.md
+outputFile: squads/gabriel-cazonato/output/instagram-content.md
 format: instagram-feed
 ---
 

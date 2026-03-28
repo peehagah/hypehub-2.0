@@ -2,7 +2,7 @@
 task: score-content
 order: 1
 agent: vera-veredito
-input: squads/influencer-hub/output/instagram-content.md + squads/influencer-hub/output/youtube-content.md
+input: squads/gabriel-cazonato/output/instagram-content.md + squads/gabriel-cazonato/output/youtube-content.md
 output: scores internos (passados para generate-feedback)
 ---
 

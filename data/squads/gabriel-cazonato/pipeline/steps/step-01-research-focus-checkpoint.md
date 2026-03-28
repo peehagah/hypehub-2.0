@@ -1,6 +1,6 @@
 ---
 type: checkpoint
-outputFile: squads/influencer-hub/pipeline/data/research-focus.md
+outputFile: squads/gabriel-cazonato/pipeline/data/research-focus.md
 ---
 
 # Step 01: Foco da Pesquisa

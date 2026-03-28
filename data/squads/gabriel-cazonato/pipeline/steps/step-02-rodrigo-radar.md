@@ -4,8 +4,8 @@ step: "02"
 agent: rodrigo-radar
 execution: subagent
 model_tier: powerful
-inputFile: squads/influencer-hub/pipeline/data/research-focus.md
-outputFile: squads/influencer-hub/output/trends-brief.md
+inputFile: squads/gabriel-cazonato/pipeline/data/research-focus.md
+outputFile: squads/gabriel-cazonato/output/trends-brief.md
 ---
 
 # Step 02: Rodrigo Radar — Pesquisa de Tendências

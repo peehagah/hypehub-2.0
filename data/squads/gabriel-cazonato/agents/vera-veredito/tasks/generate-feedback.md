@@ -3,7 +3,7 @@ task: generate-feedback
 order: 2
 agent: vera-veredito
 input: scores internos (output de score-content) + conteúdo completo
-output: squads/influencer-hub/output/review-report.md
+output: squads/gabriel-cazonato/output/review-report.md
 ---
 
 # Task: Gerar Relatório de Feedback Estruturado

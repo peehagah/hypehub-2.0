@@ -3,8 +3,8 @@ task: generate-angles
 order: 1
 agent: ivan-instagram
 phase: A
-input: squads/influencer-hub/output/trends-brief.md + tema selecionado no checkpoint
-output: squads/influencer-hub/output/angles.md
+input: squads/gabriel-cazonato/output/trends-brief.md + tema selecionado no checkpoint
+output: squads/gabriel-cazonato/output/angles.md
 ---
 
 # Task: Gerar Ângulos de Conteúdo

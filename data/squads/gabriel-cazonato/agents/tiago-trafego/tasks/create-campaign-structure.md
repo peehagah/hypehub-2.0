@@ -2,8 +2,8 @@
 task: create-campaign-structure
 order: 1
 agent: tiago-trafego
-input: squads/influencer-hub/output/review-report.md + squads/influencer-hub/output/instagram-content.md
-output: squads/influencer-hub/output/traffic-plan.md (seção estrutura de campanha)
+input: squads/gabriel-cazonato/output/review-report.md + squads/gabriel-cazonato/output/instagram-content.md
+output: squads/gabriel-cazonato/output/traffic-plan.md (seção estrutura de campanha)
 ---
 
 # Task: Criar Estrutura Completa de Campanha Meta Ads

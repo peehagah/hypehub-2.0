@@ -2,8 +2,8 @@
 task: create-script
 order: 1
 agent: yuri-youtube
-input: squads/influencer-hub/output/angles.md + tema/ângulo selecionado
-output: squads/influencer-hub/output/youtube-content.md (roteiro principal)
+input: squads/gabriel-cazonato/output/angles.md + tema/ângulo selecionado
+output: squads/gabriel-cazonato/output/youtube-content.md (roteiro principal)
 ---
 
 # Task: Criar Roteiro YouTube Completo

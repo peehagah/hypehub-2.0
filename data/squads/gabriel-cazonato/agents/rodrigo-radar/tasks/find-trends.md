@@ -2,7 +2,7 @@
 task: find-trends
 order: 1
 agent: rodrigo-radar
-input: squads/influencer-hub/pipeline/data/research-focus.md
+input: squads/gabriel-cazonato/pipeline/data/research-focus.md
 output: raw_trends (internal, passed to rank-insights)
 ---
 

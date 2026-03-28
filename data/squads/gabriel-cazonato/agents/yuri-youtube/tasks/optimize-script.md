@@ -2,8 +2,8 @@
 task: optimize-script
 order: 2
 agent: yuri-youtube
-input: squads/influencer-hub/output/youtube-content.md (roteiro principal)
-output: squads/influencer-hub/output/youtube-content.md (seção de metadados SEO)
+input: squads/gabriel-cazonato/output/youtube-content.md (roteiro principal)
+output: squads/gabriel-cazonato/output/youtube-content.md (seção de metadados SEO)
 ---
 
 # Task: Otimizar Roteiro para SEO e Plataforma YouTube

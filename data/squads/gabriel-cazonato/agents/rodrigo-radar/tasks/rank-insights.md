@@ -3,7 +3,7 @@ task: rank-insights
 order: 2
 agent: rodrigo-radar
 input: raw_trends (output de find-trends)
-output: squads/influencer-hub/output/trends-brief.md
+output: squads/gabriel-cazonato/output/trends-brief.md
 ---
 
 # Task: Ranquear e Empacotar Insights

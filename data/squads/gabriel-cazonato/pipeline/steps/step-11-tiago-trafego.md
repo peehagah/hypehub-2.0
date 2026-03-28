@@ -4,9 +4,9 @@ step: "11"
 agent: tiago-trafego
 execution: subagent
 inputFile:
-  - squads/influencer-hub/output/instagram-content.md
-  - squads/influencer-hub/output/quality-report.md
-outputFile: squads/influencer-hub/output/traffic-plan.md
+  - squads/gabriel-cazonato/output/instagram-content.md
+  - squads/gabriel-cazonato/output/quality-report.md
+outputFile: squads/gabriel-cazonato/output/traffic-plan.md
 ---
 
 # Step 11: Tiago Tráfego — Plano de Tráfego Pago

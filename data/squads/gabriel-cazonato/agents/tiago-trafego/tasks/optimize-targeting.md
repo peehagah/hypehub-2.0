@@ -2,8 +2,8 @@
 task: optimize-targeting
 order: 2
 agent: tiago-trafego
-input: squads/influencer-hub/output/traffic-plan.md (estrutura inicial) + dados históricos quando disponíveis
-output: squads/influencer-hub/output/traffic-plan.md (seção targeting + KPI thresholds)
+input: squads/gabriel-cazonato/output/traffic-plan.md (estrutura inicial) + dados históricos quando disponíveis
+output: squads/gabriel-cazonato/output/traffic-plan.md (seção targeting + KPI thresholds)
 ---
 
 # Task: Otimizar Targeting e Definir KPI Thresholds

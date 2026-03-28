@@ -3,8 +3,8 @@ task: create-carousel
 order: 2
 agent: ivan-instagram
 phase: B
-input: squads/influencer-hub/output/angles.md + ângulo selecionado no checkpoint
-output: squads/influencer-hub/output/instagram-content.md (seção carousel)
+input: squads/gabriel-cazonato/output/angles.md + ângulo selecionado no checkpoint
+output: squads/gabriel-cazonato/output/instagram-content.md (seção carousel)
 ---
 
 # Task: Criar Carousel Completo

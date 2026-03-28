@@ -4,9 +4,9 @@ step: "09"
 agent: vera-veredito
 execution: inline
 inputFile:
-  - squads/influencer-hub/output/instagram-content.md
-  - squads/influencer-hub/output/youtube-script.md
-outputFile: squads/influencer-hub/output/quality-report.md
+  - squads/gabriel-cazonato/output/instagram-content.md
+  - squads/gabriel-cazonato/output/youtube-script.md
+outputFile: squads/gabriel-cazonato/output/quality-report.md
 ---
 
 # Step 09: Vera Veredito — Revisão de Qualidade
