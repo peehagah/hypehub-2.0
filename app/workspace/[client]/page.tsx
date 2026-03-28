@@ -6,13 +6,13 @@ interface Props {
   params: { client: string }
 }
 
-export default function SquadPage({ params }: Props) {
+export default async function SquadPage({ params }: Props) {
   const squad = loadSquad(params.client)
   if (!squad) notFound()
 
   const agents = loadAgents(params.client)
   const steps = getPipelineSteps(params.client)
-  const outputs = listOutputs(params.client)
+  const outputs = await listOutputs(params.client)
   const brief = loadClientBrief(params.client)
 
   return (

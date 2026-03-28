@@ -12,11 +12,12 @@ import { listSquads, loadAgents, listOutputs } from '@/lib/squads'
 
 export const dynamic = 'force-dynamic'
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
   const squads = listSquads()
 
   const totalAgents = squads.reduce((sum, s) => sum + (s.agents?.length ?? 0), 0)
-  const totalOutputs = squads.reduce((sum, s) => sum + listOutputs(s.code).length, 0)
+  const outputCounts = await Promise.all(squads.map((s) => listOutputs(s.code).then((o) => o.length)))
+  const totalOutputs = outputCounts.reduce((sum, n) => sum + n, 0)
   const totalSteps = squads.reduce((sum, s) => sum + (s.skills?.length ?? 0), 0)
 
   return (
@@ -81,8 +82,8 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {squads.map((squad) => {
-              const outputs = listOutputs(squad.code)
+            {await Promise.all(squads.map(async (squad) => {
+              const outputs = await listOutputs(squad.code)
               const agents = loadAgents(squad.code)
               return (
                 <Link
@@ -124,7 +125,7 @@ export default function DashboardPage() {
                   )}
                 </Link>
               )
-            })}
+            }))}
           </div>
         )}
       </div>
@@ -132,3 +133,4 @@ export default function DashboardPage() {
     </div>
   )
 }
+

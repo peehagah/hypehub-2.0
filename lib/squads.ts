@@ -3,6 +3,7 @@ import path from 'path'
 import yaml from 'js-yaml'
 import type { Squad, Pipeline, AgentConfig, PipelineStep, OutputFile, ClientBrief } from './types'
 import { stepLabel, stepNumber, isCheckpointStep } from './utils'
+import { supabase, hasSupabase } from './supabase'
 
 /**
  * Resolve squads directory:
@@ -109,7 +110,7 @@ function loadAgent(
 
 // ── Outputs ────────────────────────────────────────────────────────────────
 
-export function listOutputs(squadCode: string): OutputFile[] {
+function listOutputsFromFilesystem(squadCode: string): OutputFile[] {
   const outputDir = path.join(SQUADS_DIR, squadCode, 'output')
   if (!fs.existsSync(outputDir)) return []
 
@@ -134,12 +135,39 @@ export function listOutputs(squadCode: string): OutputFile[] {
   return results.sort((a, b) => new Date(b.modifiedAt).getTime() - new Date(a.modifiedAt).getTime())
 }
 
-export function readOutput(squadCode: string, relativePath: string): string | null {
+function readOutputFromFilesystem(squadCode: string, relativePath: string): string | null {
   const outputDir = path.join(SQUADS_DIR, squadCode, 'output')
   const file = path.resolve(outputDir, relativePath)
   if (!file.startsWith(outputDir)) return null
   if (!fs.existsSync(file)) return null
   return fs.readFileSync(file, 'utf-8')
+}
+
+export async function listOutputs(squadCode: string): Promise<OutputFile[]> {
+  if (hasSupabase && supabase) {
+    const { data } = await supabase
+      .from('pipeline_outputs')
+      .select('filepath, size_bytes, created_at')
+      .eq('squad_code', squadCode)
+      .order('created_at', { ascending: false })
+    if (data && data.length > 0) {
+      return data.map((r) => ({ filename: r.filepath, sizeBytes: r.size_bytes, modifiedAt: r.created_at }))
+    }
+  }
+  return listOutputsFromFilesystem(squadCode)
+}
+
+export async function readOutput(squadCode: string, relativePath: string): Promise<string | null> {
+  if (hasSupabase && supabase) {
+    const { data } = await supabase
+      .from('pipeline_outputs')
+      .select('content')
+      .eq('squad_code', squadCode)
+      .eq('filepath', relativePath)
+      .maybeSingle()
+    if (data) return data.content
+  }
+  return readOutputFromFilesystem(squadCode, relativePath)
 }
 
 // ── Client Brief ───────────────────────────────────────────────────────────

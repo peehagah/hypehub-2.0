@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: { code: string; filepath: string[] } }
 ) {
   const relativePath = params.filepath.join('/')
-  const content = readOutput(params.code, relativePath)
+  const content = await readOutput(params.code, relativePath)
   if (content === null) {
     return NextResponse.json({ error: 'File not found' }, { status: 404 })
   }

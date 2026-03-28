@@ -15,7 +15,7 @@ export async function GET(
 
   const agents = loadAgents(code)
   const steps = getPipelineSteps(code)
-  const outputs = listOutputs(code)
+  const outputs = await listOutputs(code)
 
   return NextResponse.json({ squad, agents, steps, outputs })
 }
